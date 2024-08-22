@@ -1,4 +1,5 @@
 import random
+import time
 
 def createCards():
 
@@ -10,7 +11,8 @@ def createCards():
         for i in range(14):
             newCard  = {
                 "shape": None,
-                "value": None
+                "value": None,
+                "color": None
             }
             if i == 0:
                 newCard["value"] = "A"
@@ -23,6 +25,10 @@ def createCards():
             else:
                 newCard["value"] = str(i)
             newCard["shape"] = shapes[shape]
+            if shape == "spades" or shape == "clubs":
+                newCard["color"] = "black"
+            else:
+                newCard["color"] = "red"
             cards.append(newCard)
 
     return cards
@@ -42,8 +48,7 @@ def displayCardRow(cards):
             levels[3] += f" |__{card["value"]}| "
     
     for i in levels:
-        print(i)
-        
+        print(i)     
 
 def drawTable(columns, topRow, deck):
     
@@ -65,26 +70,57 @@ def drawTable(columns, topRow, deck):
     #Draw Deck
     newDeck = []
     newDeck.append(deck[-1])
-    print("\n  [7]")
+    newDeck.append({
+                "shape": ">",
+                "value": ">"
+            })
+    print("\n  [7]    [8]  ")
     displayCardRow(newDeck)
-    print("\nThis is your Deck")
+    #print("\nThis is your Deck")
 
     #Draw Top Row
     indexs = ""
     for i in range(4):
         if i + 8 < 10:
-            indexs += f"  [{i + 8}]  "
+            indexs += f"  [{i + 9}]  "
         else:
-            indexs += f"  [{i + 8}] "
+            indexs += f"  [{i + 9}] "
     
-    if len(topRow) == 0:
-        for i in range(4):
+    if len(topRow) < 4:
+        for i in range(4 - len(topRow)):
             topRow.append({
                 "shape": "#",
                 "value": "#"
             })
     print(f"\n{indexs}")
     displayCardRow(topRow)
+
+
+def convert(value):
+    match value:
+        case "J":
+            return "11"
+        case "Q":
+            return "12"
+        case "K":
+            return "13"
+        case "A":
+            return "0"
+        case _:
+            return value
+        
+
+def checkCardsMatch(card1, card2, colorMatters = False):
+
+
+    if colorMatters:
+        if int(convert(card1["value"])) == int(convert(card2["value"])) - 1 and card1["color"] is not card2["color"] :
+            return True
+    else:
+        if int(convert(card1["value"])) == int(convert(card2["value"])) - 1 and card1["shape"] is card2["shape"]:
+            return True
+    return False
+    
 
 def createGame(cards, _range = 7):
     prev = 0
@@ -97,7 +133,6 @@ def createGame(cards, _range = 7):
 
     return columns
 
-
 def start():
     cards = createCards()
     random.shuffle(cards)
@@ -107,12 +142,73 @@ def start():
     topRow = []
     deck = cards.copy()
 
-    drawTable(columns, topRow, deck)
+    while True:
+        drawTable(columns, topRow, deck)
 
-    command = input("\nEnter your command: ")
+        while True:
+            command = input("\nEnter your command: ")
+            print(f"You selected [{command}]")
 
-    
-    
+            
+
+            if command == "8":
+                random.shuffle(deck)
+                print("Shuffling...")
+                #time.sleep(2)
+                break
+            elif int(command) > 8:
+                print("You can't pick that command now")
+                continue
+            elif int(command) < 8:
+                second_command = input("\nEnter your second command: ")
+                if int(command) < 7 and int(second_command) < 7:
+                    match = checkCardsMatch(columns[int(command)][-1], columns[int(second_command)][-1], True)
+                    if match:
+                        columns[int(second_command)].append(columns[int(command)][-1])
+                        columns[int(command)].remove(columns[int(command)][-1])
+                        break
+                    else:
+                        print("Action not allowed they do not match")
+
+                elif command == "7" and int(second_command) < 7:
+                    match = checkCardsMatch(deck[-1], columns[int(second_command)][-1], True)
+                    if match:
+                        columns[int(second_command)].append(deck[-1])
+                        deck.remove(deck[-1])
+                        break
+                    else:
+                        print("Action not allowed, they do not match")
+
+                elif int(command) < 7 and int(second_command) > 8:
+                    if columns[int(command)][-1]["value"] == "A":
+                        topRow[int(second_command) - 9] = columns[int(command)][-1]
+                        columns[int(command)].remove(columns[int(command)][-1])
+                        break
+                    else:
+                        match = checkCardsMatch(columns[int(command)][-1], topRow[int(second_command) - 9])
+                        if match:
+                            topRow[int(second_command) - 9] = columns[int(command)][-1]
+                            columns[int(command)].remove(columns[int(command)][-1])
+                            break
+                        else:
+                            print("Action not allowed they do not match")
+
+                elif command == "7" and int(second_command) > 8:
+                    if deck[-1]["value"] == "A":
+                        topRow[int(second_command) - 9] = deck[-1]
+                        deck.remove(deck[-1])
+                        break
+                    else:
+                        match = checkCardsMatch(deck[-1], topRow[int(second_command) - 9])
+                        if match:
+                            topRow[int(second_command) - 9] = columns[int(command)][-1]
+                            deck.remove(deck[-1])
+                            break
+                        else:
+                            print("Action not allowed they do not match")
+
+                
+                
 
 
 start()

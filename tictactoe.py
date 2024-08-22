@@ -35,7 +35,7 @@ def displayBoard():
      - - -
      {board[str(4)]}|{board[str(5)]}|{board[str(6)]}
      - - -
-     3{board[str(7)]}|{board[str(8)]}|{board[str(9)]}
+     {board[str(7)]}|{board[str(8)]}|{board[str(9)]}
     '''
 
 def playMove(player, move):
