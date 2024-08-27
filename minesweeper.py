@@ -122,9 +122,9 @@ def start(rows = 20, columns = 10):
     squares = createBoard(rows, columns)
     print("""
 How to play:
-          tpye the row-column number, eg 1-0
-          then type the what you want to place there, wether a flag [>] or an empty [_]
-          If your playing this you should know how to plat mine sweaper 
+tpye the row-column number, eg 1-0
+then type the what you want to place there, wether a flag [>] or an empty [_]
+If your playing this you should know how to play minesweeper 
 """)
     while True:
         drawBoard(squares, rows, columns)
