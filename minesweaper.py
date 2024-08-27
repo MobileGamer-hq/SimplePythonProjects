@@ -35,55 +35,113 @@ def createBoard(rows, columns):
                 squaresData[i][j]["value"] = "mine"
 
     predictSquareValue(squaresData, rows, columns)
+    startPlacement(rows, columns, squaresData, 5, 6)
 
-    drawBoard(squaresData)
+    return squaresData
 
 
 
-def drawBoard(sqaures):
-    board = ""
+def drawBoard(squares, rows, columns):
+    board = "      "
+    for i in range(columns):
+        board += f"[{i}]"
+    board += "\n"
     
-    for row in sqaures:
-        line = " "
-        for sqaure in row:
+    j = 0
+    for r in squares:
+        line = f" [{j}] "
+        if j < 10:
+            line += " "
+        j += 1 
+        for square in r:
             
-                if sqaure["placed"] == True:
-                    if sqaure["value"] == "mine":
+                if square["placed"] == True:
+                    if square["value"] == "mine":
                         line += f"[>]"
                     else:
-                        line += f"[{sqaure["value"]}]"
+                        line += f"[{square["value"]}]"
                 else:
                     line += f"[ ]"
         board += line+ "\n"
     print(board)
 
-def predictSquareValue(sqaures, rows, columns):
+def predictSquareValue(squares, rows, columns):
     for i in range(rows):
         for j in range(columns):
-            if sqaures[i][j]["value"] != "mine":
-                sqauresAround = []
+            if squares[i][j]["value"] != "mine":
+                squaresAround = []
                 for x in range(i - 1, i + 2):
                     for y in range(j - 1 , j + 2):
                         if x >= 0 and x <= rows - 1 and  y >= 0 and y <= columns - 1:
                             if x == i and y == j:
                                 pass
                             else:
-                                sqauresAround.append(sqaures[x][y])
+                                squaresAround.append(squares[x][y])
                     
                     
 
                 mineCount = 0
-                for sqaure in sqauresAround:
-                    if sqaure["value"] == "mine":
+                for square in squaresAround:
+                    if square["value"] == "mine":
                         mineCount += 1
                 
-                sqaures[i][j]["value"] = mineCount
+                squares[i][j]["value"] = mineCount
 
-    return sqaures
+    return squares
 
-def startPlacement(num, rows, columns):
-    randomPlace = 0
+def startPlacement(rows, columns, squares, margin = 2, num = 4):
+    i = random.randint(0 + margin, rows - margin)
+    j = random.randint(0 - margin, columns - margin )
 
+    for x in range(i - int(num/2), i + int(num/2) ):
+        for y in range(j - int(num/2), j + int(num/2) ):
+            if squares[x][y]["value"] != "mine":
+                squares[x][y]["placed"] = True
+
+def place(position, value, squares):
+    i = 0
+    j = 0
+
+    if len(position) > 3:
+        i = int(position[0] + position[1])
+        j = int(position[3])
+    else:
+        i = int(position[0])
+        j = int(position[2])
+
+    if value == "flag" or ">" and squares[i][j]["value"] == "mine":
+        squares[i][j]["placed"] = True
+    elif value == "empty" or "_" and squares[i][j]["value"] != "mine":
+        squares[i][j]["placed"] = True
+    else:
+        return False
+    
+    return True
+
+def start(rows = 20, columns = 10):
+    squares = createBoard(rows, columns)
+    print("""
+How to play:
+          tpye the row-column number, eg 1-0
+          then type the what you want to place there, wether a flag [>] or an empty [_]
+          If your playing this you should know how to plat mine sweaper 
+""")
+    while True:
+        drawBoard(squares, rows, columns)
+
+        pos_response = input("input row-column: ")
+        val_response = input("input what you want to place there: ")
+
+        if len(pos_response) == 3 and val_response == "flag" or ">" or "empty" or "_":
+            if place(pos_response, val_response, squares) :
+                continue
+            else:
+                print("You placed on a mine. Game Over")
+        else:
+            print("your input is not correct, type the right syntax")
+            continue
+
+start()
 
 
             
@@ -92,4 +150,4 @@ def startPlacement(num, rows, columns):
           
 
 
-createBoard(20, 20)
+

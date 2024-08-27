@@ -1,44 +1,44 @@
  # if i - 1 >= 0 and j - 1 >= 0:
-                #     sqauresAround = [
-                #         sqaures[i - 1][j - 1],
-                #         sqaures[i - 0][j - 1],
-                #         sqaures[i + 1][j - 1],
-                #         sqaures[i - 1][j - 0],
-                #         sqaures[i + 1][j - 0],
-                #         sqaures[i - 1][j + 1],
-                #         sqaures[i - 0][j + 1],
-                #         sqaures[i + 1][j + 1]
+                #     squaresAround = [
+                #         squares[i - 1][j - 1],
+                #         squares[i - 0][j - 1],
+                #         squares[i + 1][j - 1],
+                #         squares[i - 1][j - 0],
+                #         squares[i + 1][j - 0],
+                #         squares[i - 1][j + 1],
+                #         squares[i - 0][j + 1],
+                #         squares[i + 1][j + 1]
                 #     ]
                 # elif i - 1 >= 0 and j - 1 < 0:
-                #     sqauresAround = [
+                #     squaresAround = [
                 #         _,
                 #         _,
                 #         _,
-                #         sqaures[i - 1][j - 0],
-                #         sqaures[i + 1][j - 0],
-                #         sqaures[i - 1][j + 1],
-                #         sqaures[i - 0][j + 1],
-                #         sqaures[i + 1][j + 1]
+                #         squares[i - 1][j - 0],
+                #         squares[i + 1][j - 0],
+                #         squares[i - 1][j + 1],
+                #         squares[i - 0][j + 1],
+                #         squares[i + 1][j + 1]
                 #     ]
                 # elif i - 1 < 0 and j - 1 >= 0:
-                #     sqauresAround = [
+                #     squaresAround = [
                 #         _,
-                #         sqaures[i - 0][j - 1],
-                #         sqaures[i + 1][j - 1],
+                #         squares[i - 0][j - 1],
+                #         squares[i + 1][j - 1],
                 #         _,
-                #         sqaures[i + 1][j - 0],
+                #         squares[i + 1][j - 0],
                 #         _,
-                #         sqaures[i - 0][j + 1],
-                #         sqaures[i + 1][j + 1]
+                #         squares[i - 0][j + 1],
+                #         squares[i + 1][j + 1]
                 #     ]
                 # elif i + 1 > rows - 1 and j - 1 :
-                #     sqauresAround = [
-                #             sqaures[i - 1][j - 1],
-                #             sqaures[i - 0][j - 1],
-                #             sqaures[i + 1][j - 1],
-                #             sqaures[i - 1][j - 0],
-                #             sqaures[i + 1][j - 0],
-                #             sqaures[i - 1][j + 1],
-                #             sqaures[i - 0][j + 1],
-                #             sqaures[i + 1][j + 1]
+                #     squaresAround = [
+                #             squares[i - 1][j - 1],
+                #             squares[i - 0][j - 1],
+                #             squares[i + 1][j - 1],
+                #             squares[i - 1][j - 0],
+                #             squares[i + 1][j - 0],
+                #             squares[i - 1][j + 1],
+                #             squares[i - 0][j + 1],
+                #             squares[i + 1][j + 1]
                 #         ]
