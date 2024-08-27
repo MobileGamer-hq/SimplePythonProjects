@@ -1,0 +1,44 @@
+ # if i - 1 >= 0 and j - 1 >= 0:
+                #     sqauresAround = [
+                #         sqaures[i - 1][j - 1],
+                #         sqaures[i - 0][j - 1],
+                #         sqaures[i + 1][j - 1],
+                #         sqaures[i - 1][j - 0],
+                #         sqaures[i + 1][j - 0],
+                #         sqaures[i - 1][j + 1],
+                #         sqaures[i - 0][j + 1],
+                #         sqaures[i + 1][j + 1]
+                #     ]
+                # elif i - 1 >= 0 and j - 1 < 0:
+                #     sqauresAround = [
+                #         _,
+                #         _,
+                #         _,
+                #         sqaures[i - 1][j - 0],
+                #         sqaures[i + 1][j - 0],
+                #         sqaures[i - 1][j + 1],
+                #         sqaures[i - 0][j + 1],
+                #         sqaures[i + 1][j + 1]
+                #     ]
+                # elif i - 1 < 0 and j - 1 >= 0:
+                #     sqauresAround = [
+                #         _,
+                #         sqaures[i - 0][j - 1],
+                #         sqaures[i + 1][j - 1],
+                #         _,
+                #         sqaures[i + 1][j - 0],
+                #         _,
+                #         sqaures[i - 0][j + 1],
+                #         sqaures[i + 1][j + 1]
+                #     ]
+                # elif i + 1 > rows - 1 and j - 1 :
+                #     sqauresAround = [
+                #             sqaures[i - 1][j - 1],
+                #             sqaures[i - 0][j - 1],
+                #             sqaures[i + 1][j - 1],
+                #             sqaures[i - 1][j - 0],
+                #             sqaures[i + 1][j - 0],
+                #             sqaures[i - 1][j + 1],
+                #             sqaures[i - 0][j + 1],
+                #             sqaures[i + 1][j + 1]
+                #         ]

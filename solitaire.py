@@ -15,6 +15,8 @@ def createCards():
                 "color": None
             }
             if i == 0:
+                continue
+            elif i == 1:
                 newCard["value"] = "A"
             elif i == 11:
                 newCard["value"] = "J"
