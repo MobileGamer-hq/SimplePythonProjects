@@ -85,6 +85,7 @@ def startPlacement(num, rows, columns):
     randomPlace = 0
 
 
+
             
 
         
