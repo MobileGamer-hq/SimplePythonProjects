@@ -35,7 +35,7 @@ def createBoard(rows, columns):
                 squaresData[i][j]["value"] = "mine"
 
     predictSquareValue(squaresData, rows, columns)
-    startPlacement(rows, columns, squaresData, 5, 6)
+    startPlacement(rows, columns, squaresData, 5)
 
     return squaresData
 
@@ -72,11 +72,19 @@ def predictSquareValue(squares, rows, columns):
                 squaresAround = []
                 for x in range(i - 1, i + 2):
                     for y in range(j - 1 , j + 2):
-                        if x >= 0 and x <= rows - 1 and  y >= 0 and y <= columns - 1:
-                            if x == i and y == j:
-                                pass
-                            else:
+                        # if x >= 0 and x <= rows - 1 and  y >= 0 and y <= columns - 1:
+                        #     if x == i and y == j:
+                        #         pass
+                        #     else:
+                        #         squaresAround.append(squares[x][y])
+
+                        if x == i  and y == j:
+                            pass
+                        else:
+                            try:
                                 squaresAround.append(squares[x][y])
+                            except IndexError:
+                                continue
                     
                     
 
@@ -89,9 +97,11 @@ def predictSquareValue(squares, rows, columns):
 
     return squares
 
-def startPlacement(rows, columns, squares, margin = 2, num = 4):
+def startPlacement(rows, columns, squares, margin = 2):
     i = random.randint(0 + margin, rows - margin)
     j = random.randint(0 - margin, columns - margin )
+
+    num = random.randint(4, 6)
 
     for x in range(i - int(num/2), i + int(num/2) ):
         for y in range(j - int(num/2), j + int(num/2) ):
@@ -109,11 +119,14 @@ def place(position, value, squares):
         i = int(position[0])
         j = int(position[2])
 
-    if value == "flag" or value == ">" and squares[i][j]["value"] == "mine":
-        squares[i][j]["placed"] = True
-    elif value == "empty" or value == "_" and squares[i][j]["value"] != "mine":
-        squares[i][j]["placed"] = True
-    else:
+    try:
+        if value == "flag" or value == ">" and squares[i][j]["value"] == "mine":
+            squares[i][j]["placed"] = True
+        elif value == "empty" or value == "_" and squares[i][j]["value"] != "mine":
+            squares[i][j]["placed"] = True
+        else:
+            return False
+    except ValueError:
         return False
     
     return True
@@ -124,7 +137,8 @@ def start(rows = 20, columns = 10):
 How to play:
 Tpye the row-column number, eg 1-0
 Then type the what you want to place there, wether a flag [>] or an empty [_]
-If your playing this you should know how to play minesweeper 
+If your playing this you should already know how to play minesweeper,
+If you don't then go and learn
 """)
     while True:
         drawBoard(squares, rows, columns)
