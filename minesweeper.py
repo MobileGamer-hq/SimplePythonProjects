@@ -109,9 +109,9 @@ def place(position, value, squares):
         i = int(position[0])
         j = int(position[2])
 
-    if value == "flag" or ">" and squares[i][j]["value"] == "mine":
+    if value == "flag" or value == ">" and squares[i][j]["value"] == "mine":
         squares[i][j]["placed"] = True
-    elif value == "empty" or "_" and squares[i][j]["value"] != "mine":
+    elif value == "empty" or value == "_" and squares[i][j]["value"] != "mine":
         squares[i][j]["placed"] = True
     else:
         return False
@@ -122,8 +122,8 @@ def start(rows = 20, columns = 10):
     squares = createBoard(rows, columns)
     print("""
 How to play:
-tpye the row-column number, eg 1-0
-then type the what you want to place there, wether a flag [>] or an empty [_]
+Tpye the row-column number, eg 1-0
+Then type the what you want to place there, wether a flag [>] or an empty [_]
 If your playing this you should know how to play minesweeper 
 """)
     while True:
@@ -137,9 +137,17 @@ If your playing this you should know how to play minesweeper
                 continue
             else:
                 print("You placed on a mine. Game Over")
+                break
         else:
             print("your input is not correct, type the right syntax")
             continue
+        
+    response = input("Dou you want to play again: ")
+    if response.lower() == "yes":
+        start()
+    else:
+        return 0
+    
 
 start()
 
