@@ -134,11 +134,10 @@ def findWithPos(pos, board):
     column = int(pos[2])
     group = int(board[row][column]["group"])
 
-    print(board[row][column]["value"])
-
     return row, column, group
 
 def crossCheck(value, rows, columns, groups, row, column, group):
+        
         for j in rows[row]:
             if value == j["value"]: return False
 
@@ -151,10 +150,34 @@ def crossCheck(value, rows, columns, groups, row, column, group):
         return True
 
 
-def Solve():
-    pass
+def solve():
+    board =  createBoard()
+    rows, columns, groups = divideBoard(board)
+    
+
+    for i in range(9):
+        for j in range(9):
+            if board[i][j]["value"] == "":
+                pos_nums =  list(range(1,10))
+                while True:
+                    try:
+                        num = random.choice(pos_nums)
+                        row, column, group = findWithPos(f"{i}-{j}", board)
+                        if crossCheck(str(num), rows, columns, groups, row, column, group):
+                            board[row][column]["value"] = str(num)
+                            break
+                        else:
+                            pos_nums.remove(num)
+                    except IndexError:
+                        break
+            else:
+                continue
+
+    displayBoard(board)
+
+                
 
 
 
-test()
+solve()
 
