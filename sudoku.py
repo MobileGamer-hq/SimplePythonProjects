@@ -1,4 +1,5 @@
 import random
+import time
 space = {"value": "", "placed": False, "position": ""}
 
 
@@ -155,6 +156,7 @@ def solve():
     rows, columns, groups = divideBoard(board)
     
 
+    print("\nSolving.....\n")
     for i in range(9):
         for j in range(9):
             if board[i][j]["value"] == "":
@@ -172,7 +174,7 @@ def solve():
                         break
             else:
                 continue
-
+    time.sleep(2)
     displayBoard(board)
 
                 
