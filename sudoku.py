@@ -1,5 +1,7 @@
 import random
 import time
+import json
+from datetime import datetime
 space = {"value": "", "placed": False, "position": ""}
 
 
@@ -126,7 +128,10 @@ def test():
     row, column, group = findWithPos("1-2", board)
     print(crossCheck(input(": "), rows, columns, groups, row, column, 2))
 
-    
+def saveData(board):
+    cureentTime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    with open(f"./Sudoku/{cureentTime}.json", "w") as file:
+        json.dump(board, file, indent=4)
 
 
 #TODO: Solving algorithm
@@ -176,6 +181,7 @@ def solve():
                 continue
     time.sleep(2)
     displayBoard(board)
+    saveData(board)
 
                 
 
