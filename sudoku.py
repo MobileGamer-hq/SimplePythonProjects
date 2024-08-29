@@ -69,4 +69,7 @@ for i in range(9):
     print(line)
 
 
+#TODO: Solving algorithm
+
+
 
