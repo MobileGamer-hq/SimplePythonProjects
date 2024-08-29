@@ -42,3 +42,151 @@
                 #             squares[i - 0][j + 1],
                 #             squares[i + 1][j + 1]
                 #         ]
+
+
+
+for i in range(3):
+        value = 0
+        random.shuffle(pos_nums)
+        group = pos_nums
+
+        for j in range(3):
+            for k in range(3):
+
+                board[i*4][j][k]["value"] = str(pos_nums[value])
+                value += 1
+            print(board[i*4][j])
+
+
+def test():
+
+
+    space = {"value": "", "placed": False, "position": ""}
+
+
+    def createBoard() -> list:
+        board = []
+
+        pos_nums = list(range(1, 10))
+
+        for i in range(9):
+            group = []
+            for j in range(3):
+                row = []
+                for k in range(3):
+                    row.append({"value": "", "placed": False, "position": f"{i} - {j} - {k}", "id": ""})
+                group.append(row)
+
+            board.append(group)
+
+        for i in range(3):
+            value = 0
+            random.shuffle(pos_nums)
+            group = pos_nums
+
+            for j in range(3):
+                for k in range(3):
+
+                    board[i*4][j][k]["value"] = str(pos_nums[value])
+                    value += 1
+
+        # print(board[0][])
+        board[1][1][1]["value"] = "0"
+        displayGroup(board)
+
+        return board
+
+
+    def displayGroup(board):
+        row = 0
+        prev = 0
+
+        for i in range(3):
+            current = prev + 3
+            for n in range(3):
+                line = ""
+                for j in range(prev, current):
+                    for k in range(3):
+                        # print(board[j][row][k]["position"])
+                        if board[j][row][k]["value"] != "":
+                            line += f"[{board[j][row][k]["value"]}]"
+                        else:
+                            line += "[ ]"
+                print(line)
+                if row == 2:
+                    row = 0
+                else:
+                    row += 1
+            prev = current
+
+    def getBoardData(path) -> list:
+        pass
+
+    def divideBoard(board: list):
+        rows = []
+        columns = []
+        groups = []
+
+        groups = board
+
+        row = 0
+        prev = 0
+
+        for i in range(3):
+            current = prev + 3
+            for n in range(3):
+                line = []
+                for j in range(prev, current):
+                    for k in range(3):
+                        line.append(board[j][row][k])
+                if row == 2:
+                    row = 0
+                else:
+                    row += 1
+                rows.append(line)
+            prev = current
+        
+        column = 0
+        sets = [
+            [0,3,6],
+            [1,4,7],
+            [2,5,8]
+        ]
+
+        for i in range(3):
+            for n in range(3):
+                line = []
+                for j in sets[i]:
+                    for k in range(3):
+                        line.append(board[j][k][column])
+                if column == 2:
+                    column = 0
+                else:
+                    column += 1
+                columns.append(line)
+            prev = current
+
+        return rows, columns, groups
+
+    def generateId(board):
+        pass
+        
+    def checkWithRules(board: list):
+        return False
+
+
+
+    board = createBoard()
+    rows, columns, groups = divideBoard(board)
+
+    for i in rows:
+        line = []
+        for j in i:
+            line.append(j["value"])
+        print(line)
+
+    for i in columns:
+        line = []
+        for j in i:
+            line.append(j["value"])
+        print(line)
