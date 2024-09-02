@@ -1,5 +1,7 @@
 import random
 import time
+from datetime import datetime
+import json
 
 def createCards():
 
@@ -135,6 +137,17 @@ def createGame(cards, _range = 7):
 
     return columns
 
+
+def saveData(table):
+    print("\nSaving Board Data....")
+    cureentTime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    location = f"./Solitaire/{cureentTime}.json"
+    with open(location, "w") as file:
+        json.dump(table, file, indent=4)
+    time.sleep(2)
+    print(f"Saved Board Data To: {location}")
+
+
 def start():
     cards = createCards()
     random.shuffle(cards)
@@ -208,6 +221,8 @@ def start():
                             break
                         else:
                             print("Action not allowed they do not match")
+            
+        saveData({"columns": columns, "top-row": topRow, "deck": deck})
 
                 
                 

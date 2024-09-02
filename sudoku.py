@@ -2,190 +2,230 @@ import random
 import time
 import json
 from datetime import datetime
-space = {"value": "", "placed": False, "position": ""}
 
-
-def createBoard():
-    board = []
-
-    pos_nums = list(range(1, 10))
-
-    x = 1
-    for i in range(9):
-        row = []
-        for j in range(9):
-                row.append({"value": "", "placed": False, "position": f"{i}-{j}"})
-                x += 1
-        board.append(row)
+class Sudoku:
+    
+    space = {"value": "", "placed": False, "position": ""}
     
 
-    sets = [
-        [0,1,2],
-        [3,4,5],
-        [6,7,8]
-    ]
+    def __init__(self) -> None:
+        self.board = []
+        self.rows = []
+        self.columns = []
+        self.groups = []
+        # self.createBoard()
+        # self.solveDiagonals()
+        # self.displayBoard()
+        # print("\n")
 
-    for i in range(3):
-        num = 0
-        random.shuffle(pos_nums)
-        for j in sets[i]:
-            for k in sets[i]:
-                board[j][k]["value"] = str(pos_nums[num])
-                num += 1
-
-    displayBoard(board)
-
-    return board
-
-def displayBoard(board):
-    for i in range(9):
-        line = ""
-        for j in range(9):
-            if board[i][j]["value"] != "":
-                line += f"[{board[i][j]["value"]}]"
-            else:
-                line += "[ ]"
-        print(line)
-
-def divideBoard(board):
-    #
-    rows = board
-    columns = []
-    groups = []
-
-    # squares = []
-
-    # for i in board:
-    #     for j in i:
-    #         squares.append(j)
-
-
-    #
-    for i in range(9):
-        column = []
-        for j in range(9):
-            column.append(board[j][i])
-        columns.append(column)
-
-    #
-    j_start = 0
-    k_start = 0
-    
-    for x in range(3):
-        for i in range(3):
-            j_stop = j_start + 3
-            group = []
-            for j in range(j_start, j_stop):
-                k_stop = k_start + 3
-                
-                for k in range(k_start, k_stop):
-                    group.append(board[j][k])
-                    board[j][k]["group"] = str(len(groups))
-
-            if k_start == 6: k_start = 0
-            else: k_start += 3
-            groups.append(group)
-        if j_start == 6: j_start = 0
-        else: j_start += 3
-
-        
-        
-                
-
-
-
-    return rows, columns, groups
-
-def test():
-    board = createBoard()
-    rows, columns, groups = divideBoard(board)
-
-    print("Columns")
-    for i in range(9):
-        
-        line = f"{i}:"
-        for j in range(9):
-            line += columns[i][j]["value"]
-        print(line)
-
-    print("Rows")
-    for i in range(9):
-        
-        line = f"{i}:"
-        for j in range(9):
-            line += rows[i][j]["value"]
-        print(line)
-
-    print("Groups")
-    if len(groups) > 0:
+    def createBoard(self):
+        self.board = []
+        x = 1
         for i in range(9):
-            
-            line = f"{i}:"
+            row = []
             for j in range(9):
-                line += groups[i][j]["value"]
+                    row.append({"value": "", "placed": False, "position": f"{i}-{j}", "group": "0"})
+                    x += 1
+            self.board.append(row)
+        
+
+        
+
+
+    def displayBoard(self):
+        for i in range(9):
+            line = ""
+            for j in range(9):
+                if self.board[i][j]["value"] != "":
+                    line += f"[{self.board[i][j]["value"]}]"
+                else:
+                    line += "[ ]"
             print(line)
 
-    row, column, group = findWithPos("1-2", board)
-    print(crossCheck(input(": "), rows, columns, groups, row, column, 2))
+    def divideBoard(self):
+        #
+        rows = self.board
+        columns = []
+        groups = []
 
-def saveData(board):
-    cureentTime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    with open(f"./Sudoku/{cureentTime}.json", "w") as file:
-        json.dump(board, file, indent=4)
+        for i in range(9):
+            column = []
+            for j in range(9):
+                column.append(self.board[j][i])
+            columns.append(column)
 
-
-#TODO: Solving algorithm
-def findWithPos(pos, board):
-    row = int(pos[0])
-    column = int(pos[2])
-    group = int(board[row][column]["group"])
-
-    return row, column, group
-
-def crossCheck(value, rows, columns, groups, row, column, group):
+        #
+        j_start = 0
+        k_start = 0
         
-        for j in rows[row]:
+        for x in range(3):
+            for i in range(3):
+                j_stop = j_start + 3
+                group = []
+                for j in range(j_start, j_stop):
+                    k_stop = k_start + 3
+                    
+                    for k in range(k_start, k_stop):
+                        group.append(self.board[j][k])
+                        self.board[j][k]["group"] = str(len(groups))
+
+                if k_start == 6: k_start = 0
+                else: k_start += 3
+                groups.append(group)
+            if j_start == 6: j_start = 0
+            else: j_start += 3
+
+
+        return rows, columns, groups
+
+    def saveData(self, DATA):
+        print("\nSaving Board Data....")
+        cureentTime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        with open(f"./Sudoku/report-{cureentTime}.json", "w") as file:
+            json.dump(DATA, file, indent=4)
+        time.sleep(2)
+        print(f"Saved Board Data To: {f"./Sudoku/{cureentTime}.json"}")
+
+
+    #TODO: Solving algorithm
+    def findWithPos(self, pos):
+        row = int(pos[0])
+        column = int(pos[2])
+        group = int(self.board[row][column]["group"])
+
+        return row, column, group
+
+    def crossCheck(self, value, row, column, group):
+        self.rows, self.columns, self.groups = self.divideBoard()
+            
+        for j in self.rows[row]:
             if value == j["value"]: return False
 
-        for j in columns[column]:
+        for j in self.columns[column]:
             if value == j["value"]: return False
 
-        for j in groups[group]:
+        for j in self.groups[group]:
             if value == j["value"]: return False
         
         return True
 
+    def solveDiagonals(self):
 
-def solve():
-    board =  createBoard()
-    rows, columns, groups = divideBoard(board)
-    
+        pos_nums = list(range(1, 10))
+        sets = [
+            [0,1,2],
+            [3,4,5],
+            [6,7,8],
+        ]
 
-    print("\nSolving.....\n")
-    for i in range(9):
-        for j in range(9):
-            if board[i][j]["value"] == "":
-                pos_nums =  list(range(1,10))
-                while True:
-                    try:
-                        num = random.choice(pos_nums)
-                        row, column, group = findWithPos(f"{i}-{j}", board)
-                        if crossCheck(str(num), rows, columns, groups, row, column, group):
-                            board[row][column]["value"] = str(num)
+        for i in range(3):
+            num = 0
+            random.shuffle(pos_nums)
+            for j in sets[i]:
+                for k in sets[i]:
+                    self.board[j][k]["value"] = str(pos_nums[num])
+                    num += 1
+
+        sets = [
+            [0,1,2],
+            [6,7,8],
+            [0,1,2],
+        ]
+
+        for i in range(2):
+            self.solveGroup(sets[i], sets[i + 1])
+
+    def solveByGroups(self):
+        sets = [
+            [[0,1,2], [0,1,2]],
+            [[0,1,2], [3,4,5]],
+            [[0,1,2], [6,7,8]],
+            [[3,4,5], [0,1,2]],
+            [[3,4,5], [3,4,5]],
+            [[3,4,5], [6,7,8]],
+            [[6,7,8], [0,1,2]],
+            [[6,7,8], [3,4,5]],
+            [[6,7,8], [6,7,8]]
+        ]
+        for i in range(9):
+            self.solveGroup(sets[i][0], sets[i][1])
+
+
+    def solveGroup(self, set1, set2):
+        for j in set1:
+                for k in set2:
+                    pos_nums = list(range(1, 10))
+                    row, column, group = self.findWithPos(f"{j}-{k}")
+                    while True:
+                        try:
+                            value = random.choice(pos_nums)
+                            if self.crossCheck(str(value), row, column, group):
+                                self.board[j][k]["value"] = str(value)
+                                break
+                            else:
+                                pos_nums.remove(value)
+                        except IndexError:
                             break
-                        else:
-                            pos_nums.remove(num)
-                    except IndexError:
-                        break
-            else:
-                continue
-    time.sleep(2)
-    displayBoard(board)
-    saveData(board)
+                    
 
-                
+    def calculatePercentage(self):
+        empty = 0
+        empty_pos = []
+        for i in range(9):
+            for j in range(9):
+                if self.board[i][j]["value"] == "":
+                    empty += 1
+                    empty_pos.append(self.board[i][j]["position"])
+        print(f"Not Done: {empty}\n{empty_pos}")
+        print(f"{int(((81-empty)/81) * 100)}% Incomplete")
+
+        return {
+            "no": empty,
+            "complete": f"{int(((81-empty)/81) * 100)}%",
+            "pos": empty_pos
+        }
 
 
 
-solve()
+    def solve(self):        
 
+        # print("\nSolving.....\n")
+        self.solveDiagonals()
+
+        for i in range(9):
+            for j in range(9):
+                if self.board[i][j]["value"] == "":
+                    pos_nums =  list(range(1,10))
+                    while True:
+                        try:
+                            num = random.choice(pos_nums)
+                            row, column, group = self.findWithPos(f"{i}-{j}")
+                            if self.crossCheck(str(num), row, column, group):
+                                self.board[row][column]["value"] = str(num)
+                                break
+                            else:
+                                pos_nums.remove(num)
+                        except IndexError:
+                            break
+                else:
+                    continue
+
+    def test(self, counts, solvingMethod):
+        data = []
+        for i in range(counts):
+            
+            self.createBoard()
+            print(f"\nCount: {i+1}")
+            solvingMethod()
+            self.displayBoard()
+            data.append(self.calculatePercentage())
+
+        self.saveData(data)
+            
+
+
+
+#
+game =  Sudoku()
+game.test(10, game.solve)
+    

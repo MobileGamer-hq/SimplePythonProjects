@@ -1,4 +1,7 @@
 import random
+from datetime import datetime
+import time
+import json
 
 def createBoard(rows = 20, columns = 10):
     numSquares = rows * columns
@@ -140,6 +143,15 @@ def place(position, value, squares):
     
     return True
 
+def saveData(board):
+    print("\nSaving Board Data....")
+    cureentTime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    location = f"./Minesweeper/{cureentTime}.json"
+    with open(location, "w") as file:
+        json.dump(board, file, indent=4)
+    time.sleep(2)
+    print(f"Saved Board Data To: {location}")
+
 def test():
     squares = createBoard()
     drawBoard(squares, test=True)
@@ -238,6 +250,7 @@ If you don't then go and learn
             continue
         
     response = input("Dou you want to play again: ")
+    saveData({"squares": squares, "rows": rows, "columns": columns})
     if response.lower() == "yes":
         start_ver_2(rows=rows, columns=columns)
     else:
