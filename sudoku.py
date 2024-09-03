@@ -13,7 +13,7 @@ class Sudoku:
         self.rows = []
         self.columns = []
         self.groups = []
-        # self.createBoard()
+        self.createBoard()
         # self.solveDiagonals()
         # self.displayBoard()
         # print("\n")
@@ -85,7 +85,7 @@ class Sudoku:
 
     def loadData(self):
         print("\nLoading Board Data....")
-        with open("./Sudoku/test-board3.json", "r") as file:
+        with open("./Sudoku/test-board2.json", "r") as file:
             data = json.load(file)
             for i in range(9):
                 for j in  range(9):
@@ -204,12 +204,13 @@ class Sudoku:
                 if self.crossCheck(str(value), row, column, group):
                     self.board[x][y]["value"] = str(value)
                     # print(f"Placed at {x}-{y}")
-                    break
+                    return True
                 else:
                     pos_nums.remove(value)
                     # if x == 2 and y == 7: print(f"cant place {value}")
             except IndexError:
                 break
+        return False
     
     def solveByGroups(self):
         sets = [
@@ -265,6 +266,7 @@ class Sudoku:
             len_rows = []
             len_columns = []
             len_groups = []
+            
             for i in range(9):
                 row_count = 0
                 column_count = 0
@@ -281,46 +283,56 @@ class Sudoku:
                 len_groups.append(group_count)
 
             for j in range(1,9):
+                done_row = False
                 if j in len_rows:
                     index_of_smallest_row = len_rows.index(j)
                     for i in range(9):
                         if self.rows[index_of_smallest_row][i]["value"] == " ":
-                            self.solveSquare(index_of_smallest_row, i)
+                            done_row = self.solveSquare(index_of_smallest_row, i)
                             break
-                    break
+                    if done_row : break
+                    else: continue
                 else: 
                     continue
-            # else:
-            #     stop_count += 1
+            else:
+                stop_count += 1
+                print("row")
 
             for j in range(1,9):
+                done_column = False
                 if j in len_columns:
-                    index_of_smallest_column = len_columns.index(j)
-                    for i in range(9):
-                        if self.columns[index_of_smallest_column][i]["value"] == " ":
-                            self.solveSquare(index_of_smallest_column, i)
-                            break
-                    break
-                    
+                    for k in range(len_columns.count(j)):
+                        index_of_smallest_column = len_columns.index(j)
+                        for i in range(9):
+                            if self.columns[index_of_smallest_column][i]["value"] == " ":
+                                done_column = self.solveSquare(index_of_smallest_column, i)
+                                break
+                        len_columns.remove(j)
+                    if done_column : break
+                    else: continue
                 else:
                     continue
-            # else:
-            #     stop_count += 1
+            else:
+                stop_count += 1
+                print("column")
             
             for j in range(1,9):
+                done_group = False
                 if j in len_groups:
                     index_of_smallest_group = len_groups.index(j)
                     for i in range(9):
                         if self.groups[index_of_smallest_group][i]["value"] == " ":
-                            self.solveSquare(index_of_smallest_group, i)
+                            done_group = self.solveSquare(index_of_smallest_group, i)
                             break
-                    break
+                    if done_group : break
+                    else: continue
                 else:
                     continue
-            # else:
-            #     stop_count += 1
+            else:
+                stop_count += 1
+                print("group")
 
-            if stop_count == 3: break
+            
 
             
 
@@ -330,9 +342,11 @@ class Sudoku:
             print(len_rows)
             print(len_columns)
             print(len_groups)
-            print()
+            print(stop_count)
 
             # self.displayBoard()
+
+            if stop_count == 3: break
 
             
 
@@ -354,7 +368,6 @@ class Sudoku:
 
 #
 game =  Sudoku()
-game.createBoard()
 # game.inputBoardData()
 game.loadData()
 game.displayBoard()
