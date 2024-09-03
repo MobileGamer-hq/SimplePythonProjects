@@ -85,13 +85,11 @@ class Sudoku:
 
     def loadData(self):
         print("\nLoading Board Data....")
-        with open("./Sudoku/test-board.json", "r") as file:
+        with open("./Sudoku/test-board2.json", "r") as file:
             data = json.load(file)
             for i in range(9):
                 for j in  range(9):
                     self.board[i][j]["value"] = data[str(i)][j]
-
-        return self.board
             
 
 
@@ -101,7 +99,7 @@ class Sudoku:
             row = input(f"input row [{i + 1}]: ")
             rows[i] = row
         print("\nSaving Board Data....")
-        with open("./Sudoku/test-board2.json", "w") as file:
+        with open("./Sudoku/test-board.json", "w") as file:
             json.dump(rows, file, indent=4)
 
 
@@ -155,6 +153,17 @@ class Sudoku:
         else:
             return False
 
+    def getLengths(self, _list):
+        len_list = []
+        for i in range(9):
+                count = 0
+                for j in range(9):
+                    if _list[i][j]["value"] == " " or _list[i][j]["value"] == "":
+                        count += 1
+                len_list.append(count)
+        return len_list
+
+    
     #Solving Algorithms
     def solveDiagonals(self):
 
@@ -234,34 +243,25 @@ class Sudoku:
     def solveByRow(self):        
 
         # print("\nSolving.....\n")
-        # self.solveDiagonals()
-        
-        # board = self.loadData()
-        # game.displayBoard()
+        self.solveDiagonals()
 
-        self.loadData()
-        game.displayBoard()
-
-        while self.checkDone() == False :
-            self.loadData()
-            print("solving.....")
-            for i in range(9):
-                for j in range(9):
-                    if self.board[i][j]["value"] == "" or self.board[i][j]["value"] == " ":
-                        pos_nums = list(range(1, 10))
-                        row, column, group = self.findWithPos(f"{i}-{j}")
-                        while True:
-                            try:
-                                value = random.choice(pos_nums)
-                                if self.crossCheck(str(value), row, column, group):
-                                    self.board[i][j]["value"] = str(value)
-                                    break
-                                else:
-                                    pos_nums.remove(value)
-                            except IndexError:
+        for i in range(9):
+            for j in range(9):
+                if self.board[i][j]["value"] == "" or self.board[i][j]["value"] == " ":
+                    pos_nums = list(range(1, 10))
+                    row, column, group = self.findWithPos(f"{i}-{j}")
+                    while True:
+                        try:
+                            value = random.choice(pos_nums)
+                            if self.crossCheck(str(value), row, column, group):
+                                self.board[i][j]["value"] = str(value)
                                 break
-                    else:
-                        continue
+                            else:
+                                pos_nums.remove(value)
+                        except IndexError:
+                            break
+                else:
+                    continue
         
         print("")
         self.displayBoard()
@@ -271,36 +271,28 @@ class Sudoku:
         # row_x = 1
         # column_x = 1
         # group_x = 1
+        
         while self.checkDone() == False:
             stop_count = 0
             self.rows, self.columns, self.groups = self.divideBoard()
-            len_rows = []
-            len_columns = []
-            len_groups = []
+            len_rows = self.getLengths(self.rows)
+            len_columns = self.getLengths(self.columns)
+            len_groups = self.getLengths(self.groups)
             
-            for i in range(9):
-                row_count = 0
-                column_count = 0
-                group_count = 0
-                for j in range(9):
-                    if self.rows[i][j]["value"] == " " or self.rows[i][j]["value"] == "":
-                        row_count += 1
-                    if self.columns[i][j]["value"] == " " or self.columns[i][j]["value"] == "":
-                        column_count += 1
-                    if self.groups[i][j]["value"] == " " or self.groups[i][j]["value"] == "":
-                        group_count += 1
-                len_rows.append(row_count)
-                len_columns.append(column_count)
-                len_groups.append(group_count)
+            
+
 
             for j in range(1,9):
                 done_row = False
+                len_rows = self.getLengths(self.rows)
                 if j in len_rows:
-                    index_of_smallest_row = len_rows.index(j)
-                    for i in range(9):
-                        if self.rows[index_of_smallest_row][i]["value"] == " ":
-                            done_row = self.solveSquare(index_of_smallest_row, i)
-                            break
+                    for k in range(len_rows.count(j)):
+                        index_of_smallest_row = len_rows.index(j)
+                        for i in range(9):
+                            if self.rows[index_of_smallest_row][i]["value"] == " ":
+                                done_row = self.solveSquare(index_of_smallest_row, i)
+                                break
+                        if done_row == False: len_rows.remove(j)
                     if done_row : break
                     else: continue
                 else: 
@@ -311,12 +303,15 @@ class Sudoku:
 
             for j in range(1,9):
                 done_column = False
+                len_columns = self.getLengths(self.columns)
                 if j in len_columns:
-                    index_of_smallest_column = len_columns.index(j)
-                    for i in range(9):
-                        if self.columns[index_of_smallest_column][i]["value"] == " ":
-                            done_column = self.solveSquare(index_of_smallest_column, i)
-                            break
+                    for k in range(len_columns.count(j)):
+                        index_of_smallest_column = len_columns.index(j)
+                        for i in range(9):
+                            if self.columns[index_of_smallest_column][i]["value"] == " ":
+                                done_column = self.solveSquare(index_of_smallest_column, i)
+                                break
+                        if done_row == False: len_columns.remove(j)
                     if done_column : break
                     else: continue
                 else:
@@ -327,12 +322,15 @@ class Sudoku:
             
             for j in range(1,9):
                 done_group = False
+                len_groups = self.getLengths(self.groups)
                 if j in len_groups:
-                    index_of_smallest_group = len_groups.index(j)
-                    for i in range(9):
-                        if self.groups[index_of_smallest_group][i]["value"] == " ":
-                            done_group = self.solveSquare(index_of_smallest_group, i)
-                            break
+                    for k in range(len_groups.count(j)):
+                        index_of_smallest_group = len_groups.index(j)
+                        for i in range(9):
+                            if self.groups[index_of_smallest_group][i]["value"] == " ":
+                                done_group = self.solveSquare(index_of_smallest_group, i)
+                                break
+                        if done_row == False: len_groups.remove(j)
                     if done_group : break
                     else: continue
                 else:
@@ -357,6 +355,8 @@ class Sudoku:
 
             if stop_count == 3: break
 
+            
+
 
     def test(self, counts, solvingMethod):
         data = []
@@ -376,7 +376,9 @@ class Sudoku:
 #
 game =  Sudoku()
 # game.inputBoardData()
-game.solveByRow()
-# game.displayBoard()
+game.loadData()
+game.displayBoard()
+game.solveWithStepBack()
+game.displayBoard()
 print(game.calculatePercentage())
     
