@@ -29,9 +29,6 @@ class Sudoku:
             self.board.append(row)
         
 
-        
-
-
     def displayBoard(self):
         for i in range(9):
             line = ""
@@ -86,6 +83,42 @@ class Sudoku:
         time.sleep(2)
         print(f"Saved Board Data To: {f"./Sudoku/{cureentTime}.json"}")
 
+    def loadData(self):
+        print("\nLoading Board Data....")
+        with open("./Sudoku/test-board3.json", "r") as file:
+            data = json.load(file)
+            for i in range(9):
+                for j in  range(9):
+                    self.board[i][j]["value"] = data[str(i)][j]
+            
+
+
+    def inputBoardData(self):
+        rows = {}
+        for i in range(9):
+            row = input(f"input row [{i + 1}]: ")
+            rows[i] = row
+        print("\nSaving Board Data....")
+        with open("./Sudoku/test-board2.json", "w") as file:
+            json.dump(rows, file, indent=4)
+
+
+    def calculatePercentage(self):
+        empty = 0
+        empty_pos = []
+        for i in range(9):
+            for j in range(9):
+                if self.board[i][j]["value"] == "" or self.board[i][j]["value"] == " ":
+                    empty += 1
+                    empty_pos.append(self.board[i][j]["position"])
+        print(f"Not Done: {empty}\n{empty_pos}")
+        print(f"{int(((81-empty)/81) * 100)}% Complete")
+
+        return {
+            "no": empty,
+            "complete": f"{int(((81-empty)/81) * 100)}%",
+            "pos": empty_pos
+        }
 
     #TODO: Solving algorithm
     def findWithPos(self, pos):
@@ -109,6 +142,18 @@ class Sudoku:
         
         return True
 
+    def checkDone(self):
+        count = 0
+        for i in range(9):
+            for j in range(9):
+                if self.board[i][j]["value"] != " ":
+                    count += 1
+        if count == 81:
+            return True
+        else:
+            return False
+
+    #Solving Algorithms
     def solveDiagonals(self):
 
         pos_nums = list(range(1, 10))
@@ -119,12 +164,7 @@ class Sudoku:
         ]
 
         for i in range(3):
-            num = 0
-            random.shuffle(pos_nums)
-            for j in sets[i]:
-                for k in sets[i]:
-                    self.board[j][k]["value"] = str(pos_nums[num])
-                    num += 1
+            self.solveGroup(sets[i], sets[i])
 
         sets = [
             [0,1,2],
@@ -135,6 +175,42 @@ class Sudoku:
         for i in range(2):
             self.solveGroup(sets[i], sets[i + 1])
 
+    def solveGroup(self, set1, set2):
+        pos_nums = list(range(1, 10))
+        for j in set1:
+                for k in set2:
+                    if self.board[j][k]["value"] == "" or self.board[j][k]["value"] == " ":
+                        
+                        row, column, group = self.findWithPos(f"{j}-{k}")
+                        while True:
+                            try:
+                                value = random.choice(pos_nums)
+                                if self.crossCheck(str(value), row, column, group):
+                                    self.board[j][k]["value"] = str(value)
+                                    break
+                                else:
+                                    pos_nums.remove(value)
+                            except IndexError:
+                                break
+                    else:
+                        continue
+    
+    def solveSquare(self, x, y):
+        pos_nums = list(range(1, 10))
+        row, column, group = self.findWithPos(f"{x}-{y}")
+        while True:
+            try:
+                value = random.choice(pos_nums)
+                if self.crossCheck(str(value), row, column, group):
+                    self.board[x][y]["value"] = str(value)
+                    # print(f"Placed at {x}-{y}")
+                    break
+                else:
+                    pos_nums.remove(value)
+                    # if x == 2 and y == 7: print(f"cant place {value}")
+            except IndexError:
+                break
+    
     def solveByGroups(self):
         sets = [
             [[0,1,2], [0,1,2]],
@@ -149,66 +225,117 @@ class Sudoku:
         ]
         for i in range(9):
             self.solveGroup(sets[i][0], sets[i][1])
+        print("")
+        self.displayBoard()
 
-
-    def solveGroup(self, set1, set2):
-        for j in set1:
-                for k in set2:
-                    pos_nums = list(range(1, 10))
-                    row, column, group = self.findWithPos(f"{j}-{k}")
-                    while True:
-                        try:
-                            value = random.choice(pos_nums)
-                            if self.crossCheck(str(value), row, column, group):
-                                self.board[j][k]["value"] = str(value)
-                                break
-                            else:
-                                pos_nums.remove(value)
-                        except IndexError:
-                            break
-                    
-
-    def calculatePercentage(self):
-        empty = 0
-        empty_pos = []
-        for i in range(9):
-            for j in range(9):
-                if self.board[i][j]["value"] == "":
-                    empty += 1
-                    empty_pos.append(self.board[i][j]["position"])
-        print(f"Not Done: {empty}\n{empty_pos}")
-        print(f"{int(((81-empty)/81) * 100)}% Incomplete")
-
-        return {
-            "no": empty,
-            "complete": f"{int(((81-empty)/81) * 100)}%",
-            "pos": empty_pos
-        }
-
-
-
-    def solve(self):        
+    def solveByRow(self):        
 
         # print("\nSolving.....\n")
         self.solveDiagonals()
 
         for i in range(9):
             for j in range(9):
-                if self.board[i][j]["value"] == "":
-                    pos_nums =  list(range(1,10))
+                if self.board[i][j]["value"] == "" or self.board[i][j]["value"] == " ":
+                    pos_nums = list(range(1, 10))
+                    row, column, group = self.findWithPos(f"{i}-{j}")
                     while True:
                         try:
-                            num = random.choice(pos_nums)
-                            row, column, group = self.findWithPos(f"{i}-{j}")
-                            if self.crossCheck(str(num), row, column, group):
-                                self.board[row][column]["value"] = str(num)
+                            value = random.choice(pos_nums)
+                            if self.crossCheck(str(value), row, column, group):
+                                self.board[i][j]["value"] = str(value)
                                 break
                             else:
-                                pos_nums.remove(num)
+                                pos_nums.remove(value)
                         except IndexError:
                             break
                 else:
                     continue
+        
+        print("")
+        self.displayBoard()
+
+
+    def solveWithStepBack(self):
+        # row_x = 1
+        # column_x = 1
+        # group_x = 1
+        while self.checkDone() == False:
+            stop_count = 0
+            self.rows, self.columns, self.groups = self.divideBoard()
+            len_rows = []
+            len_columns = []
+            len_groups = []
+            for i in range(9):
+                row_count = 0
+                column_count = 0
+                group_count = 0
+                for j in range(9):
+                    if self.rows[i][j]["value"] == " " or self.rows[i][j]["value"] == "":
+                        row_count += 1
+                    if self.columns[i][j]["value"] == " " or self.columns[i][j]["value"] == "":
+                        column_count += 1
+                    if self.groups[i][j]["value"] == " " or self.groups[i][j]["value"] == "":
+                        group_count += 1
+                len_rows.append(row_count)
+                len_columns.append(column_count)
+                len_groups.append(group_count)
+
+            for j in range(1,9):
+                if j in len_rows:
+                    index_of_smallest_row = len_rows.index(j)
+                    for i in range(9):
+                        if self.rows[index_of_smallest_row][i]["value"] == " ":
+                            self.solveSquare(index_of_smallest_row, i)
+                            break
+                    break
+                else: 
+                    continue
+            # else:
+            #     stop_count += 1
+
+            for j in range(1,9):
+                if j in len_columns:
+                    index_of_smallest_column = len_columns.index(j)
+                    for i in range(9):
+                        if self.columns[index_of_smallest_column][i]["value"] == " ":
+                            self.solveSquare(index_of_smallest_column, i)
+                            break
+                    break
+                    
+                else:
+                    continue
+            # else:
+            #     stop_count += 1
+            
+            for j in range(1,9):
+                if j in len_groups:
+                    index_of_smallest_group = len_groups.index(j)
+                    for i in range(9):
+                        if self.groups[index_of_smallest_group][i]["value"] == " ":
+                            self.solveSquare(index_of_smallest_group, i)
+                            break
+                    break
+                else:
+                    continue
+            # else:
+            #     stop_count += 1
+
+            if stop_count == 3: break
+
+            
+
+
+
+
+            print(len_rows)
+            print(len_columns)
+            print(len_groups)
+            print()
+
+            # self.displayBoard()
+
+            
+
 
     def test(self, counts, solvingMethod):
         data = []
@@ -227,5 +354,11 @@ class Sudoku:
 
 #
 game =  Sudoku()
-game.test(10, game.solve)
+game.createBoard()
+# game.inputBoardData()
+game.loadData()
+game.displayBoard()
+game.solveWithStepBack()
+game.displayBoard()
+print(game.calculatePercentage())
     
