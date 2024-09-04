@@ -85,7 +85,7 @@ class Sudoku:
 
     def loadData(self):
         print("\nLoading Board Data....")
-        with open("./Sudoku/test-board2.json", "r") as file:
+        with open("./Sudoku/test-board3.json", "r") as file:
             data = json.load(file)
             for i in range(9):
                 for j in  range(9):
@@ -163,49 +163,20 @@ class Sudoku:
                 len_list.append(count)
         return len_list
 
+    def convertPos(self, x, y, _type):
+        match _type:
+            case "row":
+                return x, y
+            case "column":
+                return y, x
+            case "group":
+                pos = self.groups[x][y]["position"]
+                return int(pos[0]), int(pos[2])
+            case _:
+                return x, y
+
     
     #Solving Algorithms
-    def solveDiagonals(self):
-
-        pos_nums = list(range(1, 10))
-        sets = [
-            [0,1,2],
-            [3,4,5],
-            [6,7,8],
-        ]
-
-        for i in range(3):
-            self.solveGroup(sets[i], sets[i])
-
-        sets = [
-            [0,1,2],
-            [6,7,8],
-            [0,1,2],
-        ]
-
-        for i in range(2):
-            self.solveGroup(sets[i], sets[i + 1])
-
-    def solveGroup(self, set1, set2):
-        pos_nums = list(range(1, 10))
-        for j in set1:
-                for k in set2:
-                    if self.board[j][k]["value"] == "" or self.board[j][k]["value"] == " ":
-                        
-                        row, column, group = self.findWithPos(f"{j}-{k}")
-                        while True:
-                            try:
-                                value = random.choice(pos_nums)
-                                if self.crossCheck(str(value), row, column, group):
-                                    self.board[j][k]["value"] = str(value)
-                                    break
-                                else:
-                                    pos_nums.remove(value)
-                            except IndexError:
-                                break
-                    else:
-                        continue
-    
     def solveSquare(self, x, y):
         pos_nums = list(range(1, 10))
         row, column, group = self.findWithPos(f"{x}-{y}")
@@ -223,137 +194,102 @@ class Sudoku:
                 break
         return False
     
-    def solveByGroups(self):
-        sets = [
-            [[0,1,2], [0,1,2]],
-            [[0,1,2], [3,4,5]],
-            [[0,1,2], [6,7,8]],
-            [[3,4,5], [0,1,2]],
-            [[3,4,5], [3,4,5]],
-            [[3,4,5], [6,7,8]],
-            [[6,7,8], [0,1,2]],
-            [[6,7,8], [3,4,5]],
-            [[6,7,8], [6,7,8]]
-        ]
-        for i in range(9):
-            self.solveGroup(sets[i][0], sets[i][1])
-        print("")
+    def solvePerFound(self, value, length_list, _list, _type):
+        done = False
+        if value in length_list:
+            for j in range(length_list.count(value)):
+                index_of_smallest = length_list.index(value)
+                for k in range(9):
+                    if _list[index_of_smallest][k]["value"] == " ":
+                        x, y = self.convertPos(index_of_smallest, k, _type)
+                        done = self.solveSquare(x, y)
+                        break
+                length_list[index_of_smallest] = 0
+        
+        return done
+
+    def solveByRemainder(self):
+        self.loadData()
         self.displayBoard()
 
-    def solveByRow(self):        
+        runtime  = 0
 
-        # print("\nSolving.....\n")
-        self.solveDiagonals()
+        done_r = True
+        done_c = True
+        done_g = True
 
-        for i in range(9):
-            for j in range(9):
-                if self.board[i][j]["value"] == "" or self.board[i][j]["value"] == " ":
-                    pos_nums = list(range(1, 10))
-                    row, column, group = self.findWithPos(f"{i}-{j}")
-                    while True:
-                        try:
-                            value = random.choice(pos_nums)
-                            if self.crossCheck(str(value), row, column, group):
-                                self.board[i][j]["value"] = str(value)
-                                break
-                            else:
-                                pos_nums.remove(value)
-                        except IndexError:
-                            break
-                else:
-                    continue
-        
-        print("")
-        self.displayBoard()
-
-
-    def solveWithStepBack(self):
-        # row_x = 1
-        # column_x = 1
-        # group_x = 1
-        
-        while self.checkDone() == False:
-            stop_count = 0
+        while self.checkDone() == False and runtime < 100:
+            runtime += 1
             self.rows, self.columns, self.groups = self.divideBoard()
+            
             len_rows = self.getLengths(self.rows)
             len_columns = self.getLengths(self.columns)
             len_groups = self.getLengths(self.groups)
             
+            # print()
+            # print(len_rows)
+            # print(len_columns)
+            # print(len_groups)
+            # print()
             
-
-
-            for j in range(1,9):
-                done_row = False
+            i = 1
+            for __ in range(4):
+                count = 0
                 len_rows = self.getLengths(self.rows)
-                if j in len_rows:
-                    for k in range(len_rows.count(j)):
-                        index_of_smallest_row = len_rows.index(j)
-                        for i in range(9):
-                            if self.rows[index_of_smallest_row][i]["value"] == " ":
-                                done_row = self.solveSquare(index_of_smallest_row, i)
-                                break
-                        if done_row == False: len_rows.remove(j)
-                    if done_row : break
-                    else: continue
-                else: 
-                    continue
-            else:
-                stop_count += 1
-                print("row")
-
-            for j in range(1,9):
-                done_column = False
                 len_columns = self.getLengths(self.columns)
-                if j in len_columns:
-                    for k in range(len_columns.count(j)):
-                        index_of_smallest_column = len_columns.index(j)
-                        for i in range(9):
-                            if self.columns[index_of_smallest_column][i]["value"] == " ":
-                                done_column = self.solveSquare(index_of_smallest_column, i)
-                                break
-                        if done_row == False: len_columns.remove(j)
-                    if done_column : break
-                    else: continue
-                else:
-                    continue
-            else:
-                stop_count += 1
-                print("column")
-            
-            for j in range(1,9):
-                done_group = False
                 len_groups = self.getLengths(self.groups)
-                if j in len_groups:
-                    for k in range(len_groups.count(j)):
-                        index_of_smallest_group = len_groups.index(j)
-                        for i in range(9):
-                            if self.groups[index_of_smallest_group][i]["value"] == " ":
-                                done_group = self.solveSquare(index_of_smallest_group, i)
-                                break
-                        if done_row == False: len_groups.remove(j)
-                    if done_group : break
-                    else: continue
-                else:
+                print()
+                print(len_rows)
+                print(len_columns)
+                print(len_groups)
+                print()
+                
+
+
+                # if i in len_rows or i in len_columns or i in len_rows:
+                #     done_r = self.solvePerFound(i, len_rows, self.rows, "row")
+                #     done_c = self.solvePerFound(i, len_columns, self.columns, "column")
+                #     done_g = self.solvePerFound(i, len_groups, self.groups, "group")
+
+                #     print(done_r, done_c, done_g)
+
+                #     if done_r == False and done_c == False and done_g == False:
+                #         if i < 9 : i+= 1
+                #         else: i = 1
+
+                # else:
+                #     print(i)
+                #     if i < 9 : i+= 1
+                #     else: i = 1
+
+                
+                
+                for j in range(1,9):
+                        if j in len_rows or j in len_columns or j in len_rows:
+                            i = j
+                            break
+
+                if done_r == False and done_c == False and done_g == False:
+                    if i < 9 : i += 1
+                    else: i = 1
                     continue
-            else:
-                stop_count += 1
-                print("group")
+
+                done_r = self.solvePerFound(i, len_rows, self.rows, "row")
+                done_c = self.solvePerFound(i, len_columns, self.columns, "column")
+                done_g = self.solvePerFound(i, len_groups, self.groups, "group")
+
+                print(done_r, done_c, done_g)
+                
+                
+
+                # self.displayBoard()
+                # print()
+                
+
 
             
 
             
-
-
-
-
-            print(len_rows)
-            print(len_columns)
-            print(len_groups)
-            print(stop_count)
-
-            # self.displayBoard()
-
-            if stop_count == 3: break
 
             
 
@@ -376,9 +312,7 @@ class Sudoku:
 #
 game =  Sudoku()
 # game.inputBoardData()
-game.loadData()
-game.displayBoard()
-game.solveWithStepBack()
+game.solveByRemainder()
 game.displayBoard()
 print(game.calculatePercentage())
     

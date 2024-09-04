@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 class Sudoku:
-    
+    current_file = ""
     space = {"value": "", "placed": False, "position": ""}
     
 
@@ -85,7 +85,7 @@ class Sudoku:
 
     def loadData(self):
         print("\nLoading Board Data....")
-        with open("./Sudoku/test-board.json", "r") as file:
+        with open(f"./Sudoku/test-board{self.current_file}.json", "r") as file:
             data = json.load(file)
             for i in range(9):
                 for j in  range(9):
@@ -101,7 +101,7 @@ class Sudoku:
             row = input(f"input row [{i + 1}]: ")
             rows[i] = row
         print("\nSaving Board Data....")
-        with open("./Sudoku/test-board2.json", "w") as file:
+        with open(f"./Sudoku/test-board{self.current_file}.json", "w") as file:
             json.dump(rows, file, indent=4)
 
 
@@ -266,11 +266,11 @@ class Sudoku:
         print("")
         self.displayBoard()
 
-
     def solveWithStepBack(self):
         # row_x = 1
         # column_x = 1
         # group_x = 1
+        self.loadData()
         while self.checkDone() == False:
             stop_count = 0
             self.rows, self.columns, self.groups = self.divideBoard()
@@ -375,8 +375,9 @@ class Sudoku:
 
 #
 game =  Sudoku()
+game.current_file = "-easy"
 # game.inputBoardData()
-game.solveByRow()
-# game.displayBoard()
+game.solveWithStepBack()
+game.displayBoard()
 print(game.calculatePercentage())
     
