@@ -270,9 +270,9 @@ class Sudoku:
 
 #
 game =  Sudoku()
-game.current_file = "-easy"
+game.current_file = "-beginner"
 # game.inputBoardData()
-game.solveWithStepBack()
+game.solveByRow()
 game.displayBoard()
 print(game.calculatePercentage())
     

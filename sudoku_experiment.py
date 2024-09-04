@@ -288,40 +288,26 @@ class Sudoku:
                 done_c = self.solvePerFound(i, len_columns, self.columns, "column")
                 done_g = self.solvePerFound(i, len_groups, self.groups, "group")
 
-                print("\n", done_r, done_c, done_g, "\n")
+                # print("\n", done_r, done_c, done_g, "\n")
 
                 done = self.checkDone()
 
-            print(f"Tries: [{_}]")
-
-            
-
-            
-
-            
-
-
-    def test(self, counts, solvingMethod):
-        data = []
-        for i in range(counts):
-            
-            self.createBoard()
-            print(f"\nCount: {i+1}")
-            solvingMethod()
+            print(f"\nTries: [{_}]\n")
             self.displayBoard()
-            data.append(self.calculatePercentage())
+            print(game.calculatePercentage())
 
-        self.saveData(data)
+            
+
             
 
 
 
 #
 game =  Sudoku()
-game.current_file = "2"
-game.tries = 10
+game.current_file = "-easy"
+game.tries = 100
 # game.inputBoardData()
 game.solveByRemainder()
-game.displayBoard()
-print(game.calculatePercentage())
+# game.displayBoard()
+# print(game.calculatePercentage())
     
