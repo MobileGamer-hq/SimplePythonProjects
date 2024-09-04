@@ -6,6 +6,8 @@ from datetime import datetime
 class Sudoku:
     
     space = {"value": "", "placed": False, "position": ""}
+    tries = 3
+    current_file = ""
     
 
     def __init__(self) -> None:
@@ -85,12 +87,13 @@ class Sudoku:
 
     def loadData(self):
         print("\nLoading Board Data....")
-        with open("./Sudoku/test-board3.json", "r") as file:
+        with open(f"./Sudoku/test-board{self.current_file}.json", "r") as file:
             data = json.load(file)
             for i in range(9):
                 for j in  range(9):
                     self.board[i][j]["value"] = data[str(i)][j]
-            
+
+        return self.board
 
 
     def inputBoardData(self):
@@ -99,8 +102,9 @@ class Sudoku:
             row = input(f"input row [{i + 1}]: ")
             rows[i] = row
         print("\nSaving Board Data....")
-        with open("./Sudoku/test-board.json", "w") as file:
+        with open(f"./Sudoku/test-board{self.current_file}.json", "w") as file:
             json.dump(rows, file, indent=4)
+
 
 
     def calculatePercentage(self):
@@ -146,7 +150,7 @@ class Sudoku:
         count = 0
         for i in range(9):
             for j in range(9):
-                if self.board[i][j]["value"] != " ":
+                if self.board[i][j]["value"] != " " and self.board[i][j]["value"] != "":
                     count += 1
         if count == 81:
             return True
@@ -177,6 +181,7 @@ class Sudoku:
 
     
     #Solving Algorithms
+
     def solveSquare(self, x, y):
         pos_nums = list(range(1, 10))
         row, column, group = self.findWithPos(f"{x}-{y}")
@@ -209,41 +214,44 @@ class Sudoku:
         return done
 
     def solveByRemainder(self):
-        self.loadData()
-        self.displayBoard()
-
-        runtime  = 0
-
-        done_r = True
-        done_c = True
-        done_g = True
-
-        while self.checkDone() == False and runtime < 100:
-            runtime += 1
-            self.rows, self.columns, self.groups = self.divideBoard()
+        done = False
+        for _ in range(self.tries):
+            if done == True: break
             
-            len_rows = self.getLengths(self.rows)
-            len_columns = self.getLengths(self.columns)
-            len_groups = self.getLengths(self.groups)
+
+            self.loadData()
+            self.displayBoard()
+
+            runtime  = 0
+
+            done_r = True
+            done_c = True
+            done_g = True
+
             
-            # print()
-            # print(len_rows)
-            # print(len_columns)
-            # print(len_groups)
-            # print()
+
             
-            i = 1
-            for __ in range(4):
-                count = 0
+
+            while done == False and runtime < 100:
+                runtime += 1
+                self.rows, self.columns, self.groups = self.divideBoard()
+                
                 len_rows = self.getLengths(self.rows)
                 len_columns = self.getLengths(self.columns)
                 len_groups = self.getLengths(self.groups)
-                print()
-                print(len_rows)
-                print(len_columns)
-                print(len_groups)
-                print()
                 
+                # print()
+                # print(len_rows)
+                # print(len_columns)
+                # print(len_groups)
+                # print()
+                
+                i = 1
+                # for __ in range(4):
+                count = 0
+                len_rows = self.getLengths(self.rows)
+                len_columns = self.getLengths(self.columns)
+                len_groups = self.getLengths(self.groups)                 
 
 
                 # if i in len_rows or i in len_columns or i in len_rows:
@@ -264,28 +272,27 @@ class Sudoku:
 
                 
                 
-                for j in range(1,9):
-                        if j in len_rows or j in len_columns or j in len_rows:
-                            i = j
-                            break
+                
 
                 if done_r == False and done_c == False and done_g == False:
                     if i < 9 : i += 1
                     else: i = 1
                     continue
+                else:
+                    for j in range(1,10):
+                        if j in len_rows or j in len_columns or j in len_rows:
+                            i = j
+                            break
 
                 done_r = self.solvePerFound(i, len_rows, self.rows, "row")
                 done_c = self.solvePerFound(i, len_columns, self.columns, "column")
                 done_g = self.solvePerFound(i, len_groups, self.groups, "group")
 
-                print(done_r, done_c, done_g)
-                
-                
+                print("\n", done_r, done_c, done_g, "\n")
 
-                # self.displayBoard()
-                # print()
-                
+                done = self.checkDone()
 
+            print(f"Tries: [{_}]")
 
             
 
@@ -311,6 +318,8 @@ class Sudoku:
 
 #
 game =  Sudoku()
+game.current_file = "2"
+game.tries = 10
 # game.inputBoardData()
 game.solveByRemainder()
 game.displayBoard()
