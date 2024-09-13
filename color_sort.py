@@ -4,8 +4,11 @@ import random
 
 #Only able to sort easy and beginner puzzles
 class ColorSort:
-    current_file = "-easy"
-    num_containers = 4
+    current_file = "-beginner"
+    num_containers = 9
+    file_path = ""
+
+    solution_data = []
     def __init__(self) -> None:
         self.puzzle = []
         self.levels = []
@@ -52,6 +55,7 @@ class ColorSort:
         with open(path, "w") as file:
             json.dump(puzzle, file, indent=4)
         print(f"file saved at: {path}")
+        self.file_path = path
 
     def createPuzzle(self):
         self.puzzle = []
@@ -59,20 +63,23 @@ class ColorSort:
             self.puzzle.append([])
 
     def readPuzzle(self):
-        self.createPuzzle()
         print("\nLoading Puzzle Data....")
         path = f"./ColorSort/test-board{self.current_file}.json"
         with open(path, "r") as file:
             data = json.load(file)
+            self.num_containers = len(data)
+            self.createPuzzle()
             for i in range(self.num_containers):
                 for j in range(len(data[i])):
                     self.puzzle[i].append(data[i][len(data[i]) - 1 - j])
+        self.file_path = path
 
     def displayContainers(self):
         count = 0
         for container in self.puzzle:
             count += 1
             print(f"{count}:", container)
+            
     
     def goTo(self, start, stop):
         if self.checkFull(stop):
@@ -81,12 +88,13 @@ class ColorSort:
             if len(self.puzzle[stop]) == 0:
                 self.puzzle[stop].append( self.puzzle[start][-1])
                 self.puzzle[start].pop()
-            elif self.puzzle[stop][-1] == self.puzzle[start][-1]:
+            elif len(self.puzzle[start]) > 0 and self.puzzle[stop][-1] == self.puzzle[start][-1]:
                 self.puzzle[stop].append( self.puzzle[start][-1])
                 self.puzzle[start].pop()
             else:
                 return None
             print(f"Went from: [{start+1}] to [{stop+1}]")
+            self.solution_data.append(f"Went from: [{start+1}] to [{stop+1}]")
 
     def seperateIntoLevels(self):
         self.levels = [[], [], [], []]
@@ -124,7 +132,7 @@ class ColorSort:
         random.shuffle(keys)
         for i in keys:
             counts[i] = self.topRow.count(i)
-        counts[" "] = self.topRow.count(" ")
+        # counts[" "] = self.topRow.count(" ")
         # print(counts)
 
         nums = []
@@ -132,12 +140,49 @@ class ColorSort:
             nums.append(counts[i])
 
         index = nums.index(max(nums))
+
+
         
         return list(counts)[index], counts[list(counts)[index]]
+
+    def arrangeEquals(self, equals = []):
+        # print("Before Sort:",equals)
+        def swap(x, y):
+            equals[x], equals[y] = equals[y], equals[x]
+
+        for i in range(len(equals)):
+            for j in range(len(equals)):
+                if len(self.puzzle[equals[i]]) > len(self.puzzle[equals[j]]):
+                    # print(len(self.puzzle[equals[i]]), len(self.puzzle[equals[j]]))
+                    swap(i, j)
+                
+
+        # print("After Sort:",equals)
+        return equals
+    
+    def findMaxs(self):
+        self.seperateIntoLevels()
+        counts = {}
+        keys = list(self.code_colors.keys())
+        for i in keys:
+            counts[i] = self.topRow.count(i)
+        print(keys)
+        print(counts)
+        final = []
+        for i in counts:
+            if counts[i] > 1:
+                final.append(self.findAllIndex(i, counts[i]))
+        return final
+
 
     def findAllIndex(self, value, count):
         _topRow = self.topRow
         ans = []
+
+        def swap(x, y):
+            ans[x], ans[y] = ans[y], ans[x]
+
+        
                 
         for i in range(count):
             index = _topRow.index(value)
@@ -147,6 +192,11 @@ class ColorSort:
                 "equals": equals
             })
             _topRow[index] = ""
+
+        for i in range(len(ans)):
+            for j in range(len(ans)):
+                if len(self.puzzle[ans[i]["index"]]) > len(self.puzzle[ans[j]["index"]]):
+                    swap(i, j)
 
         return ans
 
@@ -177,7 +227,7 @@ class ColorSort:
             return True
         return False
 
-    def solve(self):
+    def solve1(self):
         tries = 1
         for i in range(tries):
             self.readPuzzle()
@@ -200,13 +250,23 @@ class ColorSort:
                     # print(max_value, count, index, equals)
                     
                     # done = False
+                    equals = self.arrangeEquals(equals)
                     if len(equals) > 0:
                         for k in equals:
-                            if self.checkFull(k) == False and self.checkRepetition(previous, {"value": max_value, "pos": index}) == False:
+                            if self.checkDone() == False and self.checkFull(k) == False and self.checkRepetition(previous, {"value": max_value, "pos": index}) == False:
                                 self.goTo(index, k)
                                 previous["pos"], previous["value"]= k, max_value
+
+                                # print(self.possible(index, k))
                                 
+                                while self.possible(index, k):
+                                    # print("Possible")
+                                    self.goTo(index, k)
+                                    previous["pos"], previous["value"]= k, max_value
+
                                 # done = True
+                            elif self.checkDone():
+                                break
                             else:
                                 continue
                 
@@ -218,8 +278,35 @@ class ColorSort:
 
             print("Sorted Puzzle")
             self.displayContainers()
-                
-            
+            print(f"Moved: {len(self.solution_data)} times")
+            path = f"./ColorSort/test-board{self.current_file}-Solution.json"
+            print("\nSaving Puzzle Data....")
+            with open(path, "w") as file:
+                json.dump(self.solution_data, file, indent=4)
+            print(f"file saved at: {path}")
+
+
+    def possible(self, start, stop):
+        if self.checkFull(stop) == False and len(self.puzzle[start]) > 0 and self.puzzle[start][-1] == self.puzzle[stop][-1]:
+            return True
+        else:
+            return False
+
+    def solve2(self):
+        tries = 1
+        for i in range(tries):
+            self.readPuzzle()
+            self.displayContainers()
+
+            previous = {"value": "", "pos": 0}
+            for j in range(3):
+            # while self.checkDone() == False:       
+                values = self.findMaxs()
+                if len(values) > 0:
+                    newValues = random.choice(values)
+
+                    for i in newValues:
+                        print(i)
                     
         
 
@@ -228,8 +315,12 @@ class ColorSort:
 
 
 puzzle = ColorSort()
-# puzzle.readPuzzle()
 # puzzle.inputPuzzle()
+# puzzle.readPuzzle()
+# puzzle.findMaxs()
+
 # puzzle.displayContainers()
-puzzle.solve()
+puzzle.solve1()
+
+
 
