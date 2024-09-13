@@ -4,7 +4,7 @@ import random
 
 #Only able to sort easy and beginner puzzles
 class ColorSort:
-    current_file = "-difficult"
+    current_file = "-Level100"
     num_containers = 9
     file_path = ""
 
@@ -14,19 +14,6 @@ class ColorSort:
         self.levels = []
         self.topRow = []
         pass
-
-    colors_code = {
-        #
-        "blue": "B",
-        "red": "R",
-        "green": "G",
-        "yellow": "Y",
-        "pink": "P",
-        "violet": "V",
-        "orange": "O",
-        "white": "W",
-        "Amber": "A",
-    }
 
     code_colors = {
         #
@@ -232,6 +219,7 @@ class ColorSort:
         for i in range(tries):
             self.readPuzzle()
             self.displayContainers()
+            self.solution_data = []
 
             previous = {"value": "", "pos": 0}
             _ = 0
@@ -241,6 +229,7 @@ class ColorSort:
                 max_value, count = self.findMax()
 
                 values = self.findAllIndex(max_value, count)
+                random.shuffle(values)
                 
                 for value in values:
                     
@@ -344,13 +333,14 @@ class ColorSort:
         
 
 
-puzzle = ColorSort()
-# puzzle.inputPuzzle()
-# puzzle.readPuzzle()
-# puzzle.findMaxs()
+puzzle1 = ColorSort()
+puzzle2 = ColorSort()
+# puzzle1.inputPuzzle()
+# puzzle1.readPuzzle()
 
-# puzzle.displayContainers()
-puzzle.solve1()
+# puzzle1.displayContainers()
+puzzle1.solve1()
+# puzzle2.solveWithSolution()
 
 
 
