@@ -4,7 +4,7 @@ import random
 
 #Only able to sort easy and beginner puzzles
 class ColorSort:
-    current_file = "-beginner"
+    current_file = "-difficult"
     num_containers = 9
     file_path = ""
 
@@ -228,14 +228,16 @@ class ColorSort:
         return False
 
     def solve1(self):
-        tries = 1
+        tries = 100
         for i in range(tries):
             self.readPuzzle()
             self.displayContainers()
 
             previous = {"value": "", "pos": 0}
+            _ = 0
+            max_tries = 10
             # for j in range(self.num_containers**self.num_containers):
-            while self.checkDone() == False:
+            while self.checkDone() == False and _ < max_tries:
                 max_value, count = self.findMax()
 
                 values = self.findAllIndex(max_value, count)
@@ -253,6 +255,7 @@ class ColorSort:
                     equals = self.arrangeEquals(equals)
                     if len(equals) > 0:
                         for k in equals:
+
                             if self.checkDone() == False and self.checkFull(k) == False and self.checkRepetition(previous, {"value": max_value, "pos": index}) == False:
                                 self.goTo(index, k)
                                 previous["pos"], previous["value"]= k, max_value
@@ -265,25 +268,28 @@ class ColorSort:
                                     previous["pos"], previous["value"]= k, max_value
 
                                 # done = True
+                                _ = 0
                             elif self.checkDone():
                                 break
                             else:
+                                print("---")
+                                _ += 1
                                 continue
                 
                 self.displayContainers()
-                print()
+                print()  
                 
-                # if self.checkRepetition(previous, {"value": max_value, "pos": index}):
-                #     break
 
-            print("Sorted Puzzle")
-            self.displayContainers()
-            print(f"Moved: {len(self.solution_data)} times")
-            path = f"./ColorSort/test-board{self.current_file}-Solution.json"
-            print("\nSaving Puzzle Data....")
-            with open(path, "w") as file:
-                json.dump(self.solution_data, file, indent=4)
-            print(f"file saved at: {path}")
+            if self.checkDone():
+                print(f"Sorted Puzzle at try {i}")
+                self.displayContainers()
+                print(f"Moved: {len(self.solution_data)} times")
+                path = f"./ColorSort/Solutions/test-board{self.current_file}-Solution.json"
+                print("\nSaving Puzzle Data....")
+                with open(path, "w") as file:
+                    json.dump(self.solution_data, file, indent=4)
+                print(f"file saved at: {path}")
+                break
 
 
     def possible(self, start, stop):
@@ -308,7 +314,31 @@ class ColorSort:
                     for i in newValues:
                         print(i)
                     
-        
+    def solveWithSolution(self):
+        self.readPuzzle()
+        self.displayContainers()
+
+        path = f"./ColorSort/Solutions/test-board{self.current_file}-Solution.json"
+        with open(path, "r") as file:
+            solutions = json.load(file)
+            for solution in solutions:
+                start = 0
+                stop = 0
+                if solution[13] != "]":
+                    start = int(solution[12]+solution[13]) - 1
+                else:
+                   start = int(solution[12]) - 1
+
+                if solution[len(solution)- 3] != "[":
+                    stop = int(solution[len(solution)-3]+solution[len(solution)-2]) - 1
+                else:
+                   stop = int(solution[len(solution)-2]) - 1
+                print(start, stop)
+                self.goTo(start, stop)
+            self.displayContainers()
+
+
+          
 
         
         
