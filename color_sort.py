@@ -1,10 +1,11 @@
 import json
 import random
+import copy
 
 
-#Only able to sort easy and beginner puzzles
+#Only able to sort puzzles that all they colors are available
 class ColorSort:
-    current_file = "-Level100"
+    current_file = ""
     num_containers = 9
     file_path = ""
 
@@ -24,8 +25,8 @@ class ColorSort:
         "P": "pink",
         "V": "violet",
         "O": "ornage",
-        "W": "white",
-        "A": "amber"
+        "W": "grey",
+        "A": "light-blue"
     }
 
 
@@ -80,7 +81,7 @@ class ColorSort:
                 self.puzzle[start].pop()
             else:
                 return None
-            print(f"Went from: [{start+1}] to [{stop+1}]")
+            # print(f"Went from: [{start+1}] to [{stop+1}]")
             self.solution_data.append(f"Went from: [{start+1}] to [{stop+1}]")
 
     def seperateIntoLevels(self):
@@ -270,7 +271,7 @@ class ColorSort:
                 
 
             if self.checkDone():
-                print(f"Sorted Puzzle at try {i}")
+                print(f"Sorted Puzzle at try {i+1}")
                 self.displayContainers()
                 print(f"Moved: {len(self.solution_data)} times")
                 path = f"./ColorSort/Solutions/test-board{self.current_file}-Solution.json"
@@ -287,21 +288,95 @@ class ColorSort:
         else:
             return False
 
-    def solve2(self):
-        tries = 1
-        for i in range(tries):
+    def solveWithBacktracking(self, foresight = 10, tries = 100):
+        self.readPuzzle()
+        self.displayContainers()
+
+
+        
+        
+        def predictedSet():
+            puzzle_copy = copy.deepcopy(self.puzzle)
+            previous = {"value": "", "pos": 0}  
+            
+            move_count = 0
+            moves = []   
+
+
+            
+            for i in range(foresight):
+                
+                max_value, count = self.findMax()
+
+                
+
+                values = self.findAllIndex(max_value, count)
+                random.shuffle(values)
+                
+                for value in values:
+                    
+                    index = value["index"]
+                    equals = value["equals"]
+
+                    
+
+                    # print(max_value, count, index, equals)
+                    
+                    # done = False
+                    equals = self.arrangeEquals(equals)
+                    if len(equals) > 0:
+                        for k in equals:
+
+                            if self.checkDone() == False and self.checkFull(k) == False and self.checkRepetition(previous, {"value": max_value, "pos": index}) == False:
+                                self.goTo(index, k)
+                                previous["pos"], previous["value"]= k, max_value
+                                move_count += 1
+                                moves.append((index, k))
+
+                                # print(self.possible(index, k))
+                                
+                                while self.possible(index, k):
+                                    # print("Possible")
+                                    self.goTo(index, k)
+                                    previous["pos"], previous["value"]= k, max_value
+                                    move_count += 1
+                                    moves.append((index, k))
+
+                                # done = True
+                            elif self.checkDone():
+                                break
+                            else:
+                                # print("---")
+                                continue
+                
+            self.puzzle = puzzle_copy 
+            # print(move_count)
+            # print(moves)
+             
+            return moves
+
+        for _ in range(tries):
             self.readPuzzle()
-            self.displayContainers()
+            if self.checkDone() == False :
+                while self.checkDone() == False:
+                    predictions = []
+                    prediction_count = []
+                    for i in range(foresight):
+                        prediction = predictedSet()
 
-            previous = {"value": "", "pos": 0}
-            for j in range(3):
-            # while self.checkDone() == False:       
-                values = self.findMaxs()
-                if len(values) > 0:
-                    newValues = random.choice(values)
+                        predictions.append(predictedSet())
+                        prediction_count.append(len(prediction))
+                    max_prediction_sight = max(prediction_count)
+                    if max_prediction_sight > 1 : best_moves = predictions[prediction_count.index(max_prediction_sight)]
+                    else: break
 
-                    for i in newValues:
-                        print(i)
+                    for i in best_moves:
+                        self.goTo(i[0], i[1])
+                    #self.displayContainers()
+            else: break
+        
+        self.displayContainers()
+                   
                     
     def solveWithSolution(self):
         self.readPuzzle()
@@ -333,14 +408,22 @@ class ColorSort:
         
 
 
-puzzle1 = ColorSort()
-puzzle2 = ColorSort()
-# puzzle1.inputPuzzle()
-# puzzle1.readPuzzle()
+puzzle = ColorSort()
+puzzle.current_file = "-difficult"
+# puzzle.inputPuzzle()
+# puzzle.readPuzzle()
 
-# puzzle1.displayContainers()
-puzzle1.solve1()
-# puzzle2.solveWithSolution()
+# puzzle.displayContainers()
+# puzzle.solveWithBacktracking()
+puzzle.solve1()
+# puzzle.solveWithSolution()
+
+
+# i = [1,2,4,5,6,7,8]
+# x = i.copy()
+# i.pop()
+# print(x)
+
 
 
 

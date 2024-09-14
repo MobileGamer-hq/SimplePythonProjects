@@ -304,7 +304,7 @@ class Sudoku:
 
 #
 game =  Sudoku()
-game.current_file = "-easy"
+game.current_file = "-medium"
 game.tries = 100
 # game.inputBoardData()
 game.solveByRemainder()

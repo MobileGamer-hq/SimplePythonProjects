@@ -84,6 +84,7 @@ class Sudoku:
         print(f"Saved Board Data To: {f"./Sudoku/{cureentTime}.json"}")
 
     def loadData(self):
+        self.createBoard()
         print("\nLoading Board Data....")
         with open(f"./Sudoku/test-board{self.current_file}.json", "r") as file:
             data = json.load(file)
@@ -270,7 +271,7 @@ class Sudoku:
 
 #
 game =  Sudoku()
-game.current_file = "-beginner"
+game.current_file = "-easy"
 # game.inputBoardData()
 game.solveByRow()
 game.displayBoard()
