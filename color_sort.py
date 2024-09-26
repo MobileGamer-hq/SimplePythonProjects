@@ -26,7 +26,13 @@ class ColorSort:
         "V": "violet",
         "O": "ornage",
         "W": "grey",
-        "A": "light-blue"
+        "A": "light-blue",
+
+        #Abstract Color Codes
+        "L": "light-green",
+        "D": "dark-green",
+        "H": "light-pink"
+
     }
 
 
@@ -139,10 +145,17 @@ class ColorSort:
             equals[x], equals[y] = equals[y], equals[x]
 
         for i in range(len(equals)):
-            for j in range(len(equals)):
-                if len(self.puzzle[equals[i]]) > len(self.puzzle[equals[j]]):
+            for j in range(len(equals) - 1):
+                if len(self.puzzle[equals[j]]) < len(self.puzzle[equals[j+1]]):
                     # print(len(self.puzzle[equals[i]]), len(self.puzzle[equals[j]]))
-                    swap(i, j)
+                    swap(j, j+1)
+
+        # for i in range(len(equals)):
+        #     for j in range(len(equals)):
+        #         if len(self.puzzle[equals[i]]) > len(self.puzzle[equals[j]]):
+        #             # print(len(self.puzzle[equals[i]]), len(self.puzzle[equals[j]]))
+        #             swap(i, j)
+                
                 
 
         # print("After Sort:",equals)
@@ -216,7 +229,7 @@ class ColorSort:
         return False
 
     def solve1(self):
-        tries = 100
+        tries = 200
         for i in range(tries):
             self.readPuzzle()
             self.displayContainers()
@@ -409,7 +422,7 @@ class ColorSort:
 
 
 puzzle = ColorSort()
-puzzle.current_file = "-difficult"
+puzzle.current_file = "-Level121"
 # puzzle.inputPuzzle()
 # puzzle.readPuzzle()
 
