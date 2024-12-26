@@ -246,6 +246,7 @@ class Sudoku:
         while self.checkDone() == False :
             self.loadData()
             print("solving.....")
+            
             for i in range(9):
                 for j in range(9):
                     if self.board[i][j]["value"] == "" or self.board[i][j]["value"] == " ":
@@ -256,6 +257,7 @@ class Sudoku:
                                 value = random.choice(pos_nums)
                                 if self.crossCheck(str(value), row, column, group):
                                     self.board[i][j]["value"] = str(value)
+                                    self.displayBoard()
                                     break
                                 else:
                                     pos_nums.remove(value)
@@ -272,8 +274,12 @@ class Sudoku:
 #
 game =  Sudoku()
 game.current_file = "-easy"
-# game.inputBoardData()
+game.inputBoardData()
 game.solveByRow()
-game.displayBoard()
+# game.displayBoard()
 print(game.calculatePercentage())
+
+# game.solveByRow()
+# game.displayBoard()
+# print(game.calculatePercentage())
     

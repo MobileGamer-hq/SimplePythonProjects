@@ -10,6 +10,21 @@ class Chess():
         "pawn": "P"
     }
 
+    pieces = {
+        "white-castle": "♖",
+        "white-knight": "♘",
+        "white-bishop": "♗",
+        "white-queen": "♕",
+        "white-king": "♔",
+        "white-pawn": "♙",
+        "black-castle": "♜",
+        "black-knight": "♞",
+        "black-bishop": "♝",
+        "black-queen": "♛",
+        "black-king": "♚",
+        "black-pawn": "♟"
+    }
+
     def __init__(self) -> None:
         self.board = self.createBoard()
         self.drawBoard()
@@ -32,19 +47,19 @@ class Chess():
 
             for j in range(8):
                 if j == 0 or j == 7:
-                    board[int(i * 7)][j]["value"] = self.pieces["castle"]
+                    board[int(i * 7)][j]["value"] = self.pieces[color+"-"+"castle"]
                 elif j == 1 or j == 6:
-                    board[int(i * 7)][j]["value"] = self.pieces["knight"]
+                    board[int(i * 7)][j]["value"] = self.pieces[color+"-"+"knight"]
                 elif j == 2 or j == 5:
-                    board[int(i * 7)][j]["value"] = self.pieces["bishop"]
+                    board[int(i * 7)][j]["value"] = self.pieces[color+"-"+"bishop"]
                 elif j == 3:
-                    board[int(i * 7)][j]["value"] = self.pieces["queen"]
+                    board[int(i * 7)][j]["value"] = self.pieces[color+"-"+"queen"]
                 elif j == 4:
-                    board[int(i * 7)][j]["value"] = self.pieces["king"]
+                    board[int(i * 7)][j]["value"] = self.pieces[color+"-"+"king"]
 
                 
 
-                board[int((i * 5) + 1)][j]["value"] = self.pieces["pawn"]
+                board[int((i * 5) + 1)][j]["value"] = self.pieces[color+"-"+"pawn"]
 
                 # board[int(i * 7)][j]["empty"] = False
                 # board[int((i * 5) + 1)][j]["empty"] = False
@@ -53,7 +68,7 @@ class Chess():
                 board[int((i * 5) + 1)][j]["color"] = color
 
 
-        board[3][4]["value"] = self.pieces["knight"]
+        board[3][4]["value"] = self.pieces["white"+"-"+"knight"]
         board[3][4]["color"] = "white"
             
         return board
@@ -98,17 +113,17 @@ class Chess():
 
         piece = self.board[startPos_x][startPos_y]
         color = piece["color"]
-        if piece["value"] == self.pieces["castle"]:
+        if piece["value"] == self.pieces["white-castle"] or piece["value"] == self.pieces["black-castle"]:
             return self.castleMoves(startPos_x, startPos_y, color)
-        elif piece["value"] == self.pieces["knight"]:
+        elif piece["value"] == self.pieces["white-knight"] or piece["value"] == self.pieces["black-knight"]:
             return self.knightMoves(startPos_x, startPos_y, color)
-        elif piece["value"] == self.pieces["bishop"]:
+        elif piece["value"] == self.pieces["white-bishop"] or piece["value"] == self.pieces["black-bishop"]:
             pass
-        elif piece["value"] == self.pieces["queen"]:
+        elif piece["value"] == self.pieces["white-queen"] or piece["value"] == self.pieces["black-queen"]:
             pass
-        elif piece["value"] == self.pieces["king"]:
+        elif piece["value"] == self.pieces["white-king"] or piece["value"] == self.pieces["black-king"]:
             pass
-        elif piece["value"] == self.pieces["pawn"]:
+        elif piece["value"] == self.pieces["white-pawn"] or piece["value"] == self.pieces["black-pawn"]:
             pass
 
     def castleMoves(self, x, y, color):
