@@ -2,12 +2,18 @@ class Chess():
 
     space = {"value": "", "empty": False, "position": "", "color": ""}
     pieces = {
-        "castle": "C",
-        "knight": "K",
-        "bishop": "B",
-        "queen": "Q",
-        "king": "K",
-        "pawn": "P"
+        "castle-white": "♖",
+        "knight-white": "♘",
+        "bishop-white": "♗",
+        "queen-white": "♕",
+        "king-white": "♔",
+        "pawn-white": "♙",
+        "castle-black": "♜",
+        "knight-black": "♞",
+        "bishop-black": "♝",
+        "queen-black": "♛",
+        "king-black": "♚",
+        "pawn-black": "♟"
     }
 
     pieces = {
@@ -37,7 +43,7 @@ class Chess():
         for i in range(8):
             row = []
             for j in range(8):
-                row.append({"value": " ", "position": f"{i}-{j}", "color": ""})
+                row.append({"value": " ", "position": f"{i}-{j}", "color": "", "previous": ""})
             board.append(row)
 
         for i in range(2):
@@ -47,19 +53,19 @@ class Chess():
 
             for j in range(8):
                 if j == 0 or j == 7:
-                    board[int(i * 7)][j]["value"] = self.pieces[color+"-"+"castle"]
+                    board[int(i * 7)][j]["value"] = self.pieces[f"castle-{color}"]
                 elif j == 1 or j == 6:
-                    board[int(i * 7)][j]["value"] = self.pieces[color+"-"+"knight"]
+                    board[int(i * 7)][j]["value"] = self.pieces[f"knight-{color}"]
                 elif j == 2 or j == 5:
-                    board[int(i * 7)][j]["value"] = self.pieces[color+"-"+"bishop"]
+                    board[int(i * 7)][j]["value"] = self.pieces[f"bishop-{color}"]
                 elif j == 3:
-                    board[int(i * 7)][j]["value"] = self.pieces[color+"-"+"queen"]
+                    board[int(i * 7)][j]["value"] = self.pieces[f"queen-{color}"]
                 elif j == 4:
-                    board[int(i * 7)][j]["value"] = self.pieces[color+"-"+"king"]
+                    board[int(i * 7)][j]["value"] = self.pieces[f"king-{color}"]
 
                 
 
-                board[int((i * 5) + 1)][j]["value"] = self.pieces[color+"-"+"pawn"]
+                board[int((i * 5) + 1)][j]["value"] = self.pieces[f"pawn-{color}"]
 
                 # board[int(i * 7)][j]["empty"] = False
                 # board[int((i * 5) + 1)][j]["empty"] = False
@@ -68,7 +74,7 @@ class Chess():
                 board[int((i * 5) + 1)][j]["color"] = color
 
 
-        board[3][4]["value"] = self.pieces["white"+"-"+"knight"]
+        board[3][4]["value"] = self.pieces["knight"]
         board[3][4]["color"] = "white"
             
         return board
@@ -82,12 +88,43 @@ class Chess():
             
 
     #
-    def place(self, pos, kill = False):
+    def placePossiblities(self, pos, kill = False):
         x = int(pos[0])
         y = int(pos[2])
-
+        value = self.board[x][y]["value"]
         if kill: self.board[x][y]["value"] = "-"
         else: self.board[x][y]["value"] = "+"
+        self.board[x][y]["previous"] = value
+
+    def undoPlacement(self):
+        for i in range(8):
+            for j in range(8):
+                if self.board[i][j]["value"] == "-" or self.board[i][j]["value"] == "+":
+                    self.board[i][j]["value"] = self.board[i][j]["previous"]
+        pass
+
+    def move(self, start_pos, final_pos):
+        start_x = int(start_pos[0])
+        start_y = int(start_pos[2])
+
+        final_x = int(final_pos[0])
+        final_y = int(final_pos[2])
+
+        #
+        value = self.board[start_x][start_y]["value"] 
+        color = self.board[start_x][start_y]["color"]
+        previous = self.board[final_x][final_y]["previous"]
+
+        #
+        self.board[final_x][final_y]["value"] = value
+        self.board[final_x][final_y]["color"] = color
+        self.board[final_x][final_y]["previous"] = previous
+
+        #
+        self.board[start_x][start_y]["value"] = " "
+        self.board[start_x][start_y]["color"] = ""
+        self.board[start_x][start_y]["previous"] = value
+
     def playMove(self):
         pass
 
@@ -99,13 +136,56 @@ class Chess():
             return False
         
     def checkColor(self, x, y, color):
-        if self.checkEmpty(x, y) == False:
-            if self.board[x][y]["color"] == color:
+        print(x,y)
+        if self.board[x][y]["value"] != " ":
+            if self.board[x][y]["color"] == color: 
                 return True
             else:
                 return False
         else:
+            
             return False
+        
+    def countPieces(self):
+        black_pieces = {
+            "♜": "",
+            "♞": "",
+            "♝": "",
+            "♛": "",
+            "♚": "",
+            "♟": ""
+        }
+        white_pieces = {
+            "♖": "",
+            "♘": "",
+            "♗": "",
+            "♕": "",
+            "♔": "",
+            "♙": ""
+        }
+
+        for i in range(8):
+            for j in range(8):
+                if self.checkEmpty(i, j) == False:
+                    if self.board[i][j]["color"] == "white":
+                        white_pieces[self.board[i][j]["value"]] = self.board[i][j]["position"]
+                    else:
+                        black_pieces[self.board[i][j]["value"]] = self.board[i][j]["position"]
+
+        print(black_pieces)
+        print(white_pieces)
+
+
+
+    def showPossibleMoves(self, pos):
+        moves = self.possibleMoves(pos)
+        print(*moves)
+
+        for i in moves:
+            self.placePossiblities(i["pos"], i["kill"])
+
+        self.drawBoard()
+        self.undoPlacement()
 
     def possibleMoves(self, pos):
         startPos_x = int(pos[0])
@@ -113,17 +193,17 @@ class Chess():
 
         piece = self.board[startPos_x][startPos_y]
         color = piece["color"]
-        if piece["value"] == self.pieces["white-castle"] or piece["value"] == self.pieces["black-castle"]:
+        if piece["value"] == self.pieces["castle"]:
             return self.castleMoves(startPos_x, startPos_y, color)
-        elif piece["value"] == self.pieces["white-knight"] or piece["value"] == self.pieces["black-knight"]:
+        elif piece["value"] == self.pieces["knight"]:
             return self.knightMoves(startPos_x, startPos_y, color)
-        elif piece["value"] == self.pieces["white-bishop"] or piece["value"] == self.pieces["black-bishop"]:
+        elif piece["value"] == self.pieces["bishop"]:
             pass
-        elif piece["value"] == self.pieces["white-queen"] or piece["value"] == self.pieces["black-queen"]:
+        elif piece["value"] == self.pieces["queen"]:
             pass
-        elif piece["value"] == self.pieces["white-king"] or piece["value"] == self.pieces["black-king"]:
+        elif piece["value"] == self.pieces["king"]:
             pass
-        elif piece["value"] == self.pieces["white-pawn"] or piece["value"] == self.pieces["black-pawn"]:
+        elif piece["value"] == self.pieces["pawn"]:
             pass
 
     def castleMoves(self, x, y, color):
@@ -205,7 +285,7 @@ class Chess():
         possibleMoves = []
 
         def placePositiveVertical(x, y):
-            if x + 2 < 8 and y - 1 > 0 and self.checkColor(x + 2, y - 1, color) == False : 
+            if x + 2 < 8 and y - 1 >= 0 and self.checkColor(x + 2, y - 1, color) == False : 
                 if self.checkEmpty(x + 2, y - 1):
                     possibleMoves.append({
                         "pos": self.board[x+2][y - 1]["position"],
@@ -219,7 +299,7 @@ class Chess():
             else:
                 print(f"Broke for {x + 2}-{y - 1}")
 
-            if x + 2 < 8 and y + 1 > 0 and self.checkColor(x + 2, y + 1, color) == False : 
+            if x + 2 < 8 and y + 1 < 8 and self.checkColor(x + 2, y + 1, color) == False : 
                 if self.checkEmpty(x + 2, y + 1):
                     possibleMoves.append({
                         "pos": self.board[x+2][y + 1]["position"],
@@ -234,7 +314,7 @@ class Chess():
                 print(f"Broke for {x + 2}-{y + 1}") 
 
         def placeNegativeVertical(x, y):
-            if x - 2 < 8 and y - 1 > 0 and self.checkColor(x - 2, y - 1, color) == False : 
+            if x - 2 >= 0 and y - 1 >= 0 and self.checkColor(x - 2, y - 1, color) == False : 
                 if self.checkEmpty(x - 2, y - 1):
                     possibleMoves.append({
                         "pos": self.board[x - 2][y - 1]["position"],
@@ -248,7 +328,7 @@ class Chess():
             else:
                 print(f"Broke for {x - 2}-{y - 1}")
 
-            if x - 2 < 8 and y + 1 > 0 and self.checkColor(x - 2, y + 1, color) == False : 
+            if x - 2 >= 0 and y + 1 >= 0 and self.checkColor(x - 2, y + 1, color) == False : 
                 if self.checkEmpty(x - 2, y + 1):
                     possibleMoves.append({
                         "pos": self.board[x - 2][y + 1]["position"],
@@ -263,88 +343,214 @@ class Chess():
                 print(f"Broke for {x - 2}-{y + 1}") 
         
         def placePositiveHorizontal(x, y):
-            if x + 2 < 8 and y - 1 > 0 and self.checkColor(x + 2, y - 1, color) == False : 
-                if self.checkEmpty(y - 1, x + 2):
+            m = x - 1
+            n = y + 2
+            if  m >= 0 and n < 8 and self.checkColor(m, n, color) == False : 
+                if self.checkEmpty(m, n):
                     possibleMoves.append({
-                        "pos": self.board[y - 1][x + 2]["position"],
+                        "pos": self.board[m][n]["position"],
                         "kill" : False
                     })
                 else:
                     possibleMoves.append({
-                        "pos": self.board[y - 1][x + 2]["position"],
+                        "pos": self.board[m][n]["position"],
                         "kill" : True
                     })
             else:
-                print(f"Broke for {y - 1}-{x + 2}")
+                print(f"Broke for {m}-{n}")
 
-            if x + 2 < 8 and y + 1 > 0 and self.checkColor(x + 2, y + 1, color) == False : 
-                if self.checkEmpty( y + 1, x + 2):
+            m = x + 1
+            if m < 8 and n < 8 and self.checkColor(m, n, color) == False : 
+                if self.checkEmpty( m, n):
                     possibleMoves.append({
-                        "pos": self.board[y + 1][x + 2]["position"],
+                        "pos": self.board[m][n]["position"],
                         "kill" : False
                     })
                 else:
                     possibleMoves.append({
-                        "pos": self.board[y + 1][x + 2]["position"],
+                        "pos": self.board[m][n]["position"],
                         "kill" : True
                     })
             else:
-                print(f"Broke for {x + 2}-{y + 1}") 
+                print(f"Broke for {m}-{n}") 
 
         def placeNegativeHorizontal(x, y):
-            if x - 2 < 8 and y - 1 > 0 and self.checkColor(x - 2, y - 1, color) == False : 
-                if self.checkEmpty( y - 1, x - 2):
+            m = x - 1
+            n = y - 2
+            if m >= 0 and n >= 0 and self.checkColor(m, n, color) == False : 
+                if self.checkEmpty(m, n):
                     possibleMoves.append({
-                        "pos": self.board[y - 1][x - 2]["position"],
+                        "pos": self.board[m][n]["position"],
                         "kill" : False
                     })
                 else:
                     possibleMoves.append({
-                        "pos": self.board[y - 1][x - 2]["position"],
+                        "pos": self.board[m][n]["position"],
                         "kill" : True
                     })
             else:
-                print(f"Broke for {y - 1}-{x -2}")
-
-            if x - 2 < 8 and y + 1 > 0 and self.checkColor(x - 2, y + 1, color) == False : 
-                if self.checkEmpty(y + 1, x - 2,):
+                print(f"Broke for {m}-{n}")
+            
+            m = x + 1
+            if m < 8 and n >= 0 and self.checkColor(m, n, color) == False : 
+                if self.checkEmpty( m, n):
                     possibleMoves.append({
-                        "pos": self.board[y + 1][x - 2]["position"],
+                        "pos": self.board[m][n]["position"],
                         "kill" : False
                     })
                 else:
                     possibleMoves.append({
-                        "pos": self.board[y + 1][x - 2]["position"],
+                        "pos": self.board[m][n]["position"],
                         "kill" : True
                     })
             else:
-                print(f"Broke for {y + 1}-{x - 2}") 
+                print(f"Broke for {m}-{n}") 
         
 
         placePositiveVertical(x,y)
         placeNegativeVertical(x,y)
-        placePositiveHorizontal(y,x)
-        placeNegativeHorizontal(y,x)
+        placePositiveHorizontal(x, y)
+        placeNegativeHorizontal(x, y)
 
         return possibleMoves
         
+    def bishopMoves(self, x, y, color):
+        possibleMoves = []
+        
+        for i in range(8): 
+            m, n = i + 1 + x , i + 1 + y
 
+            if m < 8 and n < 8 and m >= 0 and n >= 0:
+                if self.checkColor(m, n, color) == False : 
+                    if self.checkEmpty(m, n,):
+                        possibleMoves.append({
+                            "pos": self.board[m][n]["position"],
+                            "kill" : False
+                        })
+                    else:
+                        possibleMoves.append({
+                            "pos": self.board[m][n]["position"],
+                            "kill" : True
+                        })
+                        break
+                else:
+                    print(f"Broke for {m}-{n}")
+                    break
+            else:
+                print(f"Broke for {m}-{n}")
+                break
+        
+        for i in range(8): 
+            m, n = x - (i + 1) , y + (i + 1)
+
+            if m < 8 and n < 8 and m >= 0 and n >= 0:
+                if self.checkColor(m, n, color) == False : 
+                    if self.checkEmpty(m, n,):
+                        possibleMoves.append({
+                            "pos": self.board[m][n]["position"],
+                            "kill" : False
+                        })
+                    else:
+                        possibleMoves.append({
+                            "pos": self.board[m][n]["position"],
+                            "kill" : True
+                        })
+                        break
+                else:
+                    print(f"Broke for {m}-{n}")
+                    break
+            else:
+                print(f"Broke for {m}-{n}")
+                break
+        
+        for i in range(8): 
+            m, n = x + (i + 1) , y - (i + 1)
+
+            if m < 8 and n < 8 and m >= 0 and n >= 0:
+                if self.checkColor(m, n, color) == False : 
+                    if self.checkEmpty(m, n,):
+                        possibleMoves.append({
+                            "pos": self.board[m][n]["position"],
+                            "kill" : False
+                        })
+                    else:
+                        possibleMoves.append({
+                            "pos": self.board[m][n]["position"],
+                            "kill" : True
+                        })
+                        break
+                else:
+                    print(f"Broke for {m}-{n}")
+                    break
+            else:
+                print(f"Broke for {m}-{n}")
+                break
+        
+        for i in range(8): 
+            m, n = x - (i + 1) , y - (i + 1)
+
+            if m < 8 and n < 8 and m >= 0 and n >= 0:
+                if self.checkColor(m, n, color) == False : 
+                    if self.checkEmpty(m, n,):
+                        possibleMoves.append({
+                            "pos": self.board[m][n]["position"],
+                            "kill" : False
+                        })
+                    else:
+                        possibleMoves.append({
+                            "pos": self.board[m][n]["position"],
+                            "kill" : True
+                        })
+                        break
+                else:
+                    print(f"Broke for {m}-{n}")
+                    break
+            else:
+                print(f"Broke for {m}-{n}")
+                break
         
 
-    def bishopMoves(self, x, y, color):
-        pass 
+        return possibleMoves
+
+    def kingMoves(self, x, y, color):
+        possibleMoves = []
+
+        for i in range(x - 1, x + 2):
+            for j in range(y - 1 , y + 2):
+                if i >= 0 and i < 8 and  j >= 0 and j < 8:
+                    if i == x and j == y:
+                        pass
+                    else:
+                        if self.checkColor(i, j, color) == False :
+                            if self.checkEmpty(i, j):
+                                possibleMoves.append({
+                                    "pos": self.board[i][j]["position"],
+                                    "kill" : False
+                                })
+                            else:
+                                possibleMoves.append({
+                                    "pos": self.board[i][j]["position"],
+                                    "kill" : True
+                                })
+                        else:
+                            pass
+
+        return possibleMoves
 
 
+
+
+    def test(self, x, y, value, color = "white"):
+        self.board[x][y]["value"] = self.pieces[value]
+        self.board[x][y]["color"] = color
+        self.showPossibleMoves(f"{x}-{y}")
 
     def start():
         pass
 
 
 game = Chess()
+game.test(3, 3, "king-black", "black")
+game.countPieces()
 
-moves = game.possibleMoves("3-4")
 
-for i in moves:
-    game.place(i["pos"], i["kill"])
-
-game.drawBoard()
