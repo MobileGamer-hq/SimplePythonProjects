@@ -422,13 +422,13 @@ class ColorSort:
 
 
 puzzle = ColorSort()
-puzzle.current_file = "-Level132"
+puzzle.current_file = "-Level108"
 # puzzle.inputPuzzle()
 puzzle.readPuzzle()
 
 # puzzle.displayContainers()
-puzzle.solveWithBacktracking()
-# puzzle.solve1()
+# puzzle.solveWithBacktracking()
+puzzle.solve1()
 # puzzle.solveWithSolution()
 
 

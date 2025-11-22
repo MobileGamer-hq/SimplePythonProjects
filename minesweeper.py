@@ -61,14 +61,16 @@ def drawBoard(squares, rows = 20, columns = 10, test = False):
                         if square["value"] == "mine":
                             line += f"[>]"
                         else:
-                            line += f"[{square["value"]}]"
+                            value = square["value"]
+                            line += f"[{value}]"
                     else:
                         line += f"[ ]"
                 else:
                     if square["value"] == "mine":
                         line += f"[>]"
                     else:
-                        line += f"[{square["value"]}]"
+                        value = square["value"]
+                        line += f"[{value}]"
         board += line+ "\n"
     print(board)
 

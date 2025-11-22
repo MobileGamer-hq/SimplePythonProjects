@@ -16,21 +16,6 @@ class Chess():
         "pawn-black": "♟"
     }
 
-    pieces = {
-        "white-castle": "♖",
-        "white-knight": "♘",
-        "white-bishop": "♗",
-        "white-queen": "♕",
-        "white-king": "♔",
-        "white-pawn": "♙",
-        "black-castle": "♜",
-        "black-knight": "♞",
-        "black-bishop": "♝",
-        "black-queen": "♛",
-        "black-king": "♚",
-        "black-pawn": "♟"
-    }
-
     def __init__(self) -> None:
         self.board = self.createBoard()
         self.drawBoard()
@@ -74,7 +59,7 @@ class Chess():
                 board[int((i * 5) + 1)][j]["color"] = color
 
 
-        board[3][4]["value"] = self.pieces["knight"]
+        board[3][4]["value"] = self.pieces["knight-white"]
         board[3][4]["color"] = "white"
             
         return board
@@ -83,7 +68,8 @@ class Chess():
         for i in range(8):
             line = ""
             for j in range(8):
-                line += f"[{self.board[i][j]["value"]}]"
+                value = self.board[i][j]["value"]
+                line += f"[{value}]"
             print(line)
             
 
@@ -545,7 +531,7 @@ class Chess():
         self.board[x][y]["color"] = color
         self.showPossibleMoves(f"{x}-{y}")
 
-    def start():
+    def start(self):
         pass
 
 

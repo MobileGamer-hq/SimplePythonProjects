@@ -34,7 +34,8 @@ class Sudoku:
             line = ""
             for j in range(9):
                 if self.board[i][j]["value"] != "":
-                    line += f"[{self.board[i][j]["value"]}]"
+                    value = self.board[i][j]["value"]
+                    line += f"[{value}]"
                 else:
                     line += "[ ]"
             print(line)
@@ -81,7 +82,8 @@ class Sudoku:
         with open(f"./Sudoku/report-{cureentTime}.json", "w") as file:
             json.dump(DATA, file, indent=4)
         time.sleep(2)
-        print(f"Saved Board Data To: {f"./Sudoku/{cureentTime}.json"}")
+        value = f"./Sudoku/{cureentTime}.json"
+        print(f"Saved Board Data To: {value}")
 
     def loadData(self):
         self.createBoard()
